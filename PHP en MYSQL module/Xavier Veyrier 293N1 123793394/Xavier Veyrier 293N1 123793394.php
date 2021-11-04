@@ -6,7 +6,6 @@
   
     $conc_zinnen = $zin_1 . " " . $zin_2 . " " . $zin_3 . ".";
   
-    //echo $conc_zinnen;
   
 ?>
 

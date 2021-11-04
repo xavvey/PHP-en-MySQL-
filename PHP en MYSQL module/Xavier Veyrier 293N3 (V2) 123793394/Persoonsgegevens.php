@@ -1,5 +1,5 @@
 <?php 
-if(isset($_POST["submit_persoonsgegevens"])) // submit_persoosgegevens refereert naar 'name="submit_persoonsgegevens" van de submit knop.
+if(isset($_POST["submit_persoonsgegevens"]))
 {   
     $gegevens_arr = array("naam" => $_POST["naam"], 
                             "adres" => $_POST["adres"], 
@@ -10,7 +10,6 @@ if(isset($_POST["submit_persoonsgegevens"])) // submit_persoosgegevens refereert
 
     $fh = fopen("gegevens.txt", "w") or die("Kon bestand niet aanmaken");
     
-    // Variabele $line_break schrijft gegevens op een nieuwe regel, behalve bij de eerste set gegevens. 
     $line_break = "";
     foreach($gegevens_arr as $gegevens => $input)
     { 
@@ -48,8 +47,8 @@ if(isset($_POST["submit_persoonsgegevens"])) // submit_persoosgegevens refereert
             <label for='email'>E-mail:</label><br>
             <input type="email" id="email" name="email" placeholder = "johndoe@email.com" required><br><br>
             <input type="submit" name="submit_persoonsgegevens" value="Opslaan"><br>
-        </form> <!--bij een tweede form krijgt de submit tag een unieke name attribuut waardoor deze gescheiden wordt middels een PHP if() statement -->
-        <?php if(isset($_POST["submit_persoonsgegevens"])) : ?> <!-- ook hier weer scheiding van eventuele forms door de unieke name attribuut -->
+        </form>
+        <?php if(isset($_POST["submit_persoonsgegevens"])) : ?>
             <h1>Op <?php echo $timestamp_post ?> uur de volgende persoon ingelezen</h1>
             <h3>
                 <?php 

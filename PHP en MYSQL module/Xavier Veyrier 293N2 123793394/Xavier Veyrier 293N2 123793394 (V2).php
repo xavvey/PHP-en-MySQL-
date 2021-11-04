@@ -4,10 +4,10 @@
     {
         public $naam, $diameter;
 
-        function __construct($voorwerp, $diam)
+        function __construct($voorwerp_naam, $diameter)
         {
-            $this->diameter = $diam;
-            $this->naam = $voorwerp;
+            $this->diameter = $diameter;
+            $this->naam = $voorwerp_naam;
         }
 
         function oppervlakteCirkel()

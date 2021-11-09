@@ -41,31 +41,31 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
             echo '<td><input type="text" name="huisnummer" value="' . $row['huisnummer'] . '"></td>';
             echo '<td>' . $row["adres"] . '</td>';
             echo '<td><select id="postcode" name="postcode">';
-                    include __DIR__ .'../select_postcodes.php';
-            echo '</select>';
+                toon_table_form_postcodes($conn);
+            echo '</select></td>';
             echo '<td>' . $row["woonplaats"] . '</td>';
             echo '<td><input type="email" name="email" value="';
-            toon_contactgegevens("emails", $row, $conn, "email", "form_data");
+                toon_contactgegevens('emails', $row, $conn, 'email', 'form_data');
             echo '"multiple></td>';
             echo '<td><input type="tel" name="telnrs" value="';
-            toon_contactgegevens("telefoonnummers", $row, $conn, "telefoonnummer", "form_data");
+                toon_contactgegevens('telefoonnummers', $row, $conn, 'telefoonnummer', 'form_data');
             echo '"multiple></td>';         
             echo '<td><button type="submit">Save</button></td>';
             echo '<td>----</td>';
             echo '</form>';
         } else {           
-            echo '<td>' . htmlspecialchars($row["lidnummer"])   . "</td>";
-            echo '<td>' . htmlspecialchars($row["voornaam"])    . "</td>";
-            echo '<td>' . htmlspecialchars($row["naam"])        . "</td>";
-            echo '<td>' . htmlspecialchars($row["huisnummer"])  . "</td>";
+            echo '<td>' . htmlspecialchars($row["lidnummer"])   . '</td>';
+            echo '<td>' . htmlspecialchars($row["voornaam"])    . '</td>';
+            echo '<td>' . htmlspecialchars($row["naam"])        . '</td>';
+            echo '<td>' . htmlspecialchars($row["huisnummer"])  . '</td>';
             echo '<td>' . htmlspecialchars($row["adres"])       . '</td>';
             echo '<td>' . htmlspecialchars($row["postcode"])    . '</td>';
             echo '<td>' . htmlspecialchars($row["woonplaats"])  . '</td>';
             echo '<td>';
-            toon_contactgegevens('emails', $row, $conn, 'email', "table_data");
+                toon_contactgegevens('emails', $row, $conn, 'email', 'table_data');
             echo '</td>';
             echo '<td>'; 
-            toon_contactgegevens("telefoonnummers", $row, $conn, "telefoonnummer", "table_data");
+                toon_contactgegevens('telefoonnummers', $row, $conn, 'telefoonnummer', 'table_data');
             echo '</td>';  
             echo '<td><a href="home_ledenlijst.php?lidnummer=' . $row["lidnummer"] . '">Update</a></td>';
             echo '<td><a href="includes/delete_lid.php?lidnummer=' . $row["lidnummer"] . '">Delete</a></td>';                     
@@ -74,7 +74,8 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
     }
 }
 
-
+$select_result->close();
+$conn->close();
 
 function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $usage)
 {
@@ -92,7 +93,7 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
         if($usage == "form_data")
         {
             echo $seperator . htmlspecialchars($subrow[$db_column]); 
-            $seperator = ",";        
+            $seperator = ", ";        
         }
         elseif($usage == 'table_data')
         {
@@ -101,6 +102,33 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
     } 
 }
 
-$select_result->close();
-$conn->close();
+function toon_table_form_postcodes($conn)
+{
+    $postcode_query = "SELECT * FROM postcodes
+                            ORDER BY postcode";           
+
+    $postcode_result = $conn->query($postcode_query);
+    if(!$postcode_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+    Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+
+    $num_postcodes = $postcode_result->num_rows;
+    $lidnummer = $_GET['lidnummer'];
+
+    $lid_postcode_query = "SELECT postcode FROM leden WHERE lidnummer='$lidnummer'"; 
+    $lid_postcode_result = $conn->query($lid_postcode_query);
+    if(!$lid_postcode_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+        Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+
+    $lid_row = $lid_postcode_result->fetch_array(MYSQLI_ASSOC);   
+    $lid_postcode = htmlspecialchars($lid_row['postcode']);
+
+    echo "<option value='$lid_postcode' selected>$lid_postcode</option>";
+    for($p = 0; $p < $num_postcodes; ++$p)
+    {
+        $row = $postcode_result->fetch_array(MYSQLI_ASSOC);
+
+        $postcode = htmlspecialchars($row['postcode']);
+        echo "<option value='$postcode'>$postcode</option>"; 
+    }
+}
 ?>

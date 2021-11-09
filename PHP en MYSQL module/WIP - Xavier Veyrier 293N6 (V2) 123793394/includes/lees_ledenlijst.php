@@ -48,10 +48,6 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
             echo '<td><input type="telnrs" name="telnrs" value="';
             toon_contactgegevens("telefoonnummers", $row, $conn, "telefoonnummer", "form_data");
             echo '"multiple></td>';         
-            // echo '<textarea>';
-            // toon_contactgegevens('emails', $row, $conn, 'email', 'form_data');
-            // echo '</textarea>';
-            // echo '</td>';
             echo '<td><button type="submit" class="buttons">Save</button></td>';
             echo '<td>----</td>';
             echo '</form>';
@@ -99,7 +95,6 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
         }
         elseif($usage == 'table_data')
         {
-            // $subrow = $subresult->fetch_array(MYSQLI_ASSOC);
             echo htmlspecialchars($subrow[$db_column]) . "<br>";
         }
     } 

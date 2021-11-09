@@ -34,11 +34,11 @@
         </label>
         <label for="emailadres">
             E-mailadres(sen):
-            <input type="text" id="emailadres" name="emailadres" placeholder="Komma tussen meer emails">
+            <input type="text" id="emailadres" name="emailadres" placeholder="Komma's tussen 2 of meer emails">
         </label>
         <label for="telnr">
             Telefoonummer(s):
-            <input type="text" id="telnr" name="telnr" placeholder="Komma tussen meer telnrs" >
+            <input type="text" id="telnr" name="telnr" placeholder="Komma's tussen 2 of meer telnrs" >
         </label>
         </b>
         <button type="submit" id = 'add_member' name='add_member'>Voeg lid toe</button>

@@ -50,7 +50,7 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
             echo '<td><input type="tel" name="telnrs" value="';
             toon_contactgegevens("telefoonnummers", $row, $conn, "telefoonnummer", "form_data");
             echo '"multiple></td>';         
-            echo '<td><button type="submit" class="buttons">Save</button></td>';
+            echo '<td><button type="submit">Save</button></td>';
             echo '<td>----</td>';
             echo '</form>';
         } else {           
@@ -67,15 +67,14 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
             echo '<td>'; 
             toon_contactgegevens("telefoonnummers", $row, $conn, "telefoonnummer", "table_data");
             echo '</td>';  
-            echo '<td><a class="buttons" href="home_ledenlijst.php?lidnummer='.  $row["lidnummer"] . '" role="button">Update</a></td>';
-            echo '<td><a class="buttons" href="includes/delete_lid.php?lidnummer=' . $row["lidnummer"] . '" role="button">Delete</a></td>';                     
+            echo '<td><a href="home_ledenlijst.php?lidnummer=' . $row["lidnummer"] . '">Update</a></td>';
+            echo '<td><a href="includes/delete_lid.php?lidnummer=' . $row["lidnummer"] . '">Delete</a></td>';                     
         }       
         echo "</tr>";
     }
 }
 
-$select_result->close();
-$conn->close();
+
 
 function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $usage)
 {
@@ -101,4 +100,7 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
         }
     } 
 }
+
+$select_result->close();
+$conn->close();
 ?>

@@ -25,6 +25,7 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
     echo '<td>Update</td>';
     echo '<td>Delete</td>';
     echo '<tr>';
+    
     for ($j = 0 ; $j < $num_members ; ++$j)
     { 
         $row = $select_result->fetch_array(MYSQLI_ASSOC);   

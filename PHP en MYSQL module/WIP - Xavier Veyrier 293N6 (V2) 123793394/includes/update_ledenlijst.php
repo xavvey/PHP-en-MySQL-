@@ -1,5 +1,5 @@
 <?php
-require_once 'connection.php';
+require_once __DIR__ .'../connection.php';
 
 $lidnummer = $_POST['lidnummer'];
 $voornaam = $_POST['voornaam'];

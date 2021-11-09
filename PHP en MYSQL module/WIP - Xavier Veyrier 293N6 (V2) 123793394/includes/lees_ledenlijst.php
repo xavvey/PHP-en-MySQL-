@@ -1,8 +1,9 @@
 <?php
-require_once 'includes/connection.php';
+require_once __DIR__ .'../connection.php';
 
 $select_query = "SELECT * FROM leden  
-                    NATURAL JOIN postcodes";
+                    NATURAL JOIN postcodes
+                    ORDER BY lidnummer";
 
 $select_result = $conn->query($select_query);
 if(!$select_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
@@ -40,13 +41,13 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
             echo '<td><input type="text" name="huisnummer" value="' . $row['huisnummer'] . '"></td>';
             echo '<td>' . $row["adres"] . '</td>';
             echo '<td><select id="postcode" name="postcode">';
-                    include 'includes/select_postcodes.php';
+                    include __DIR__ .'../select_postcodes.php';
             echo '</select>';
             echo '<td>' . $row["woonplaats"] . '</td>';
             echo '<td><input type="email" name="email" value="';
             toon_contactgegevens("emails", $row, $conn, "email", "form_data");
             echo '"multiple></td>';
-            echo '<td><input type="telnrs" name="telnrs" value="';
+            echo '<td><input type="tel" name="telnrs" value="';
             toon_contactgegevens("telefoonnummers", $row, $conn, "telefoonnummer", "form_data");
             echo '"multiple></td>';         
             echo '<td><button type="submit" class="buttons">Save</button></td>';
@@ -57,9 +58,9 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
             echo '<td>' . htmlspecialchars($row["voornaam"])    . "</td>";
             echo '<td>' . htmlspecialchars($row["naam"])        . "</td>";
             echo '<td>' . htmlspecialchars($row["huisnummer"])  . "</td>";
-            echo '<td>' . htmlspecialchars($row["adres"]) . '</td>';
-            echo '<td>' . htmlspecialchars($row["postcode"]) . '</td>';
-            echo '<td>' . htmlspecialchars($row["woonplaats"]) . '</td>';
+            echo '<td>' . htmlspecialchars($row["adres"])       . '</td>';
+            echo '<td>' . htmlspecialchars($row["postcode"])    . '</td>';
+            echo '<td>' . htmlspecialchars($row["woonplaats"])  . '</td>';
             echo '<td>';
             toon_contactgegevens('emails', $row, $conn, 'email', "table_data");
             echo '</td>';
@@ -67,7 +68,7 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
             toon_contactgegevens("telefoonnummers", $row, $conn, "telefoonnummer", "table_data");
             echo '</td>';  
             echo '<td><a class="buttons" href="home_ledenlijst.php?lidnummer='.  $row["lidnummer"] . '" role="button">Update</a></td>';
-            echo "<td><a class='buttons' href='includes/delete_ledenlijst.php?id='" . $row['lidnummer'] . "' role='button'>Delete</a></td>";                     
+            echo '<td><a class="buttons" href="includes/delete_lid.php?lidnummer=' . $row["lidnummer"] . '" role="button">Delete</a></td>';                     
         }       
         echo "</tr>";
     }
@@ -92,7 +93,7 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
         if($usage == "form_data")
         {
             echo $seperator . htmlspecialchars($subrow[$db_column]); 
-            $seperator = ",66";        
+            $seperator = ",";        
         }
         elseif($usage == 'table_data')
         {

@@ -3,11 +3,12 @@ require_once __DIR__ .'../connection.php';
 
 $lidnummer = $_POST['lidnummer'];
 $voornaam = $_POST['voornaam'];
-$naam = $_POST['naam'];
+$achternaam = $_POST['naam'];
 $huisnummer = $_POST['huisnummer'];
+$postcode = $_POST['postcode'];
 
-$stmt = $conn->prepare('UPDATE leden SET voornaam=?, naam=?, huisnummer=? WHERE lidnummer=?');
-$stmt->bind_param('sssi', $voornaam, $naam, $huisnummer, $lidnummer);
+$stmt = $conn->prepare('UPDATE leden SET voornaam=?, naam=?, huisnummer=?, postcode=? WHERE lidnummer=?');
+$stmt->bind_param('ssssi', $voornaam, $achternaam, $huisnummer, $postcode, $lidnummer );
 $stmt->execute();
 
 $stmt->close();

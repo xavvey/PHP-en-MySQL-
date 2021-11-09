@@ -11,7 +11,8 @@
 <h3>Voeg hieronder een nieuw lid toe:</h3>
 
     <div class="leden-form">    
-    <form action="includes/toevoegen_ledenlijst.php" method="POST"><b>
+    <form action="includes/toevoegen_ledenlijst.php" method="POST">
+        <b>
         <label for="naam">
             Voornaam:
             <input type="text" id="voornaam" name="voornaam">
@@ -38,7 +39,8 @@
         <label for="telnr">
             Telefoonummer(s):
             <input type="text" id="telnr" name="telnr" placeholder="Komma tussen meer telnrs" >
-        </label></b>
+        </label>
+        </b>
         <button type="submit" id = 'add_member' name='add_member'>Voeg lid toe</button>
     </form><br>
     </div>

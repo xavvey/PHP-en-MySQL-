@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/connection.php';
+require_once __DIR__ . '../connection.php';
 
 $postcode_query = "SELECT * FROM postcodes ORDER BY postcode";
 
@@ -15,6 +15,5 @@ for($p = 0; $p < $num_postcodes; ++$p)
 
     $postcode = htmlspecialchars($row['postcode']);
     echo "<option value='$postcode'>$postcode</option>"; 
-
 }
 ?>

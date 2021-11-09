@@ -1,0 +1,50 @@
+CREATE TABLE postcodes (
+	postcode VARCHAR(6) NOT NULL,
+	adres VARCHAR(30) NOT NULL,
+	woonplaats VARCHAR(28) NOT NULL,
+	PRIMARY KEY(postcode)
+);
+
+CREATE TABLE leden (
+	lidnummer int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	naam VARCHAR(20)NOT NULL,
+	voornaam VARCHAR(20) NOT NULL,
+	huisnummer VARCHAR(15) NOT NULL,
+	postcode VARCHAR(6) NOT NULL,
+	PRIMARY KEY (lidnummer),
+	FOREIGN KEY (postcode) REFERENCES postcodes(postcode)
+);
+
+CREATE TABLE emails (
+	email VARCHAR(40) NOT NULL,
+	lidnummer int(10) UNSIGNED NOT NULL,
+	PRIMARY KEY (email),
+	FOREIGN KEY(lidnummer) REFERENCES leden(lidnummer)
+);
+
+CREATE TABLE telefoonnummers (
+	telefoonnummer VARCHAR(13) NOT NULL,
+	lidnummer int(10) UNSIGNED NOT NULL,
+	PRIMARY KEY (telefoonnummer),
+	FOREIGN KEY(lidnummer) REFERENCES leden(lidnummer)
+);
+
+INSERT INTO postcodes VALUES ('1234AB', 'SQ-Laan', 'PHPetten');
+INSERT INTO leden (naam, voornaam, huisnummer, postcode) VALUES ('Bakker', 'Dave', '14b', '1234AB');
+INSERT INTO emails VALUES ('Dave@mail.com', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('0645781245', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('0654351657', LAST_INSERT_ID());
+
+INSERT INTO postcodes VALUES ('9764CD', 'Spechtlaan', 'Amsterdam');
+INSERT INTO leden (naam, voornaam, huisnummer, postcode) VALUES ('Beek', 'John', '26', '9764CD');
+INSERT INTO emails VALUES ('John@mail.com', LAST_INSERT_ID());
+INSERT INTO emails VALUES ('Johnwerk@mail.com', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('0405784216', LAST_INSERT_ID());
+
+INSERT INTO postcodes VALUES ('6542GT', 'Esther de Boer van Rijkpark', 'Heerhugowaard');
+INSERT INTO leden (naam, voornaam, huisnummer, postcode) VALUES ('Kocken', 'Sjoerd', '1-hoog', '6542GT');
+INSERT INTO emails VALUES ('Sjoerd@mail.com', LAST_INSERT_ID());
+INSERT INTO emails VALUES ('Sjoerdprive@mail.com', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('+311085467985', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('+31645785426', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('+317258546546', LAST_INSERT_ID());

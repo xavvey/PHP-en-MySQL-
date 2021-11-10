@@ -1,34 +1,52 @@
-.leden-form {
+.text-right {
+    text-align: right;
+  }
+     
+  a.right-link {
+    color: #1c2fd1;
+    font-size: medium;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  a.right-link:hover {
+    color: #f90;
+    text-decoration: underline;
+  }
+  
+  .leden-form {
     width: 200px;
     clear: both;
-}
-    
-.leden-form input {
+  }
+  
+  .leden-form input {
     width: 100%;
     clear: both;
-}
-
-label, input {
+  }
+  
+  label,
+  input {
     display: block;
-}
-
-label {
+  }
+  
+  label {
     margin-bottom: 10px;
-}
-
-table {
+  }
+  
+  table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 100%;
-}
-
-td, th {
+  }
+  
+  td,
+  th {
     border: 1px solid #dddddd;
     text-align: left;
     padding: 8px;
-}
-
-tr:nth-child(even) {
+  }
+  
+  tr:nth-child(even) {
     background-color: #dddddd;
-}
+  }
 

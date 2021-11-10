@@ -40,8 +40,8 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
             echo '<td><input type="text" name="naam" value="' . $row['naam'] . '"></td>';
             echo '<td><input type="text" name="huisnummer" value="' . $row['huisnummer'] . '"></td>';
             echo '<td>' . $row["adres"] . '</td>';
-            echo '<td><select id="postcode" name="postcode">';
-                toon_table_form_postcodes($conn);
+            echo '<td><select name="postcode">';
+                update_postcode($conn);
             echo '</select></td>';
             echo '<td>' . $row["woonplaats"] . '</td>';
             echo '<td><input type="email" name="email" value="';
@@ -102,7 +102,7 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
     } 
 }
 
-function toon_table_form_postcodes($conn)
+function update_postcode($conn)
 {
     $postcode_query = "SELECT * FROM postcodes
                             ORDER BY postcode";           

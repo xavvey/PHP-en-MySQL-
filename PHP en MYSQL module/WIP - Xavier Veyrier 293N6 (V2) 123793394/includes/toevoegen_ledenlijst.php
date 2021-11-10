@@ -33,7 +33,6 @@ function insert_contact_details($conn, $input, $db_table)
 
         foreach($contacts_arr as $contact)
         {      
-            
             $stmt->bind_param('s', $contact,);
             $stmt->execute();
         }

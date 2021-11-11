@@ -6,14 +6,12 @@
 </head>
 <body>
 
-<div class="text-right">
-    <a class='right-link' href='postcodes.php' target='blank'>Postcodes toevoegen/verwijderen</a>
+<div>
+    <h1>Verenigingsoverzicht</h1>
+    <a href='postcodes.php' target='blank'>Naar postcode overzicht</a>
 </div>
 
-<h1>Verenigingsoverzicht</h1>
-
-<div class="leden-form"> 
-    
+<div class="leden-form">     
     <h3>Voeg nieuw lid toe:</h3>
    
     <form action="includes/toevoegen_ledenlijst.php" method="POST"><b>
@@ -49,7 +47,6 @@
 </div>
 
 <div>
-
     <h3>Ledenoverzicht</h3>
 
     <table>

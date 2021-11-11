@@ -1,52 +1,36 @@
-.text-right {
-    text-align: right;
-  }
-     
-  a.right-link {
-    color: #1c2fd1;
-    font-size: medium;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  a.right-link:hover {
-    color: #f90;
-    text-decoration: underline;
-  }
-  
-  .leden-form {
-    width: 200px;
-    clear: both;
-  }
-  
-  .leden-form input {
-    width: 100%;
-    clear: both;
-  }
-  
-  label,
-  input {
-    display: block;
-  }
-  
-  label {
-    margin-bottom: 10px;
-  }
-  
-  table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-  }
-  
-  td,
-  th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #dddddd;
-  }
+.leden-form {
+  width: 200px;
+  clear: both;
+}
+
+.leden-form input {
+  width: 100%;
+  clear: both;
+}
+
+label,
+input {
+  display: block;
+}
+
+label {
+  margin-bottom: 10px;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
 

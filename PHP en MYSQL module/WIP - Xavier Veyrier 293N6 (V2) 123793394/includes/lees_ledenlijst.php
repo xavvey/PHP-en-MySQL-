@@ -68,7 +68,7 @@ if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h
                 toon_contactgegevens('telefoonnummers', $row, $conn, 'telefoonnummer', 'table_data');
             echo '</td>';  
             echo '<td><a href="home_ledenlijst.php?lidnummer=' . $row["lidnummer"] . '">Update</a></td>';
-            echo '<td><a href="includes/delete_lid.php?lidnummer=' . $row["lidnummer"] . '">Delete</a></td>';                     
+            echo '<td><a href="includes/delete.php?lidnummer=' . $row["lidnummer"] . '">Delete</a></td>';                     
         }       
         echo "</tr>";
     }

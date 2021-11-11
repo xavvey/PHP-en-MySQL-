@@ -16,12 +16,34 @@ if(isset($_POST["add_member"]))
 
     insert_contact_details($conn, $telnrs, 'telefoonnummers');
     insert_contact_details($conn, $emails, 'emails');
+
+    header("location: ../home_ledenlijst.php");
+    $stmt_lid->close();
 }
 
-function get_post($conn, $var)
+if(isset($_POST["add_postcode"]))
 {
-    return $conn->real_escape_string($_POST[$var]);
-}
+    $postcode   = get_post($conn, "postcode");
+    $adres      = get_post($conn, "straat");
+    $woonplaats = get_post($conn, "woonplaats");
+
+    $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
+    $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
+
+    $stmt->execute();
+
+    if($stmt->affected_rows != 1)
+    { 
+        echo '<script> alert("Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
+        echo '<script> window.location.href = "../postcodes.php" </script>';         
+    } 
+    else
+    {
+        header("location: ../postcodes.php");
+    }
+
+    $stmt->close();    
+}  
 
 function insert_contact_details($conn, $input, $db_table)
 {
@@ -39,5 +61,8 @@ function insert_contact_details($conn, $input, $db_table)
     }
 }
 
-header("location: ../home_ledenlijst.php");
+function get_post($conn, $var)
+{
+    return $conn->real_escape_string($_POST[$var]);
+}
 ?> 

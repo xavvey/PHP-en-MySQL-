@@ -8,13 +8,13 @@
 
 <div>
     <h1>Verenigingsoverzicht</h1>
-    <a href='postcodes.php' target='blank'>Naar postcode overzicht</a>
+    <a href='postcodes.php'>Naar postcode overzicht</a>
 </div>
 
 <div class="leden-form">     
     <h3>Voeg nieuw lid toe:</h3>
    
-    <form action="includes/toevoegen_ledenlijst.php" method="POST"><b>
+    <form action="includes/add.php" method="POST"><b>
         <label for="naam">
             Voornaam:
             <input type="text" name="voornaam">
@@ -51,7 +51,7 @@
 
     <table>
         <tbody>
-            <?php include 'includes/lees_ledenlijst.php'; ?>
+            <?php include 'includes/ledenlijst_table.php'; ?>
         </tbody>
     </table>
 </div>

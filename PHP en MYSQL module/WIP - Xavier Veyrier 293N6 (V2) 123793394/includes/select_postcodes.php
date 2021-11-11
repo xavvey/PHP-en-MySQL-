@@ -16,6 +16,9 @@ for($p = 0; $p < $num_postcodes; ++$p)
     $row = $postcode_result->fetch_array(MYSQLI_ASSOC);
 
     $postcode = htmlspecialchars($row['postcode']);
-    echo "<option value='$postcode'>$postcode</option>"; 
+    $straat = htmlspecialchars($row['adres']);
+    $woonplaats = htmlspecialchars($row['woonplaats']);
+
+    echo "<option value='$postcode'>" . $postcode . " - " . $straat . " - " . $woonplaats . "</option>"; 
 }
 ?>

@@ -47,7 +47,7 @@
 </div>
 
 <div>
-    <h3>Ledenoverzicht</h3>
+    <h3>Leden:</h3>
 
     <table>
         <tbody>

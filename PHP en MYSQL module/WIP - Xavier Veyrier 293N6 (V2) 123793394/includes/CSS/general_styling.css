@@ -1,18 +1,20 @@
 .leden-form {
-  width: 200px;
+  width: 250px;
   clear: both;
 }
 
-.leden-form input {
-  width: 100%;
+.leden-form input, select {
+  width: 150%;
   clear: both;
 }
 
+select,
 label,
 input {
   display: block;
 }
 
+select,
 label {
   margin-bottom: 10px;
 }

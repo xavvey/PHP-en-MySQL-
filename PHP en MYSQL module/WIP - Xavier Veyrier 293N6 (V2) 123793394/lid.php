@@ -8,7 +8,7 @@
 
 <div>
     <h1>Update lid</h1>
-    <a href='home_ledenlijst.php'>Naar ledenoverzicht</a>
+    <a href='home_ledenlijst.php'>Naar ledenoverzicht</a><br>
 </div>
 
 <div>
@@ -17,15 +17,18 @@
         <tbody>
             <tr>
                 <td>#</td>
-                <td>Gegevens</td>
+                <td>Info</td>
                 <td>Pas aan</td>
+                <td>Delete</td>
             </tr>
-
-            
+            <?php 
+            include 'includes/read.php';
+            show_single_lid($conn);
+            ?>          
         </tbody>
     </table>
 </div>
 
-<?php include 'includes/update.php'; ?>
+
 </body>
 </html>

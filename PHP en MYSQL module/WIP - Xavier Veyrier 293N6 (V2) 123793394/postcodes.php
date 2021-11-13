@@ -8,7 +8,7 @@
 
 <div>
     <h1>Postcode overzicht</h1>
-    <a href='home_ledenlijst.php' target='blank'>Naar ledenoverzicht</a>
+    <a href='home_ledenlijst.php'>Naar ledenoverzicht</a>
 </div>  
 
 <div class='postcode-form'>

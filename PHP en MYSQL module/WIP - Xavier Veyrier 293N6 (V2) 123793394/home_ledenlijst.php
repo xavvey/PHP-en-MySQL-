@@ -5,6 +5,7 @@
   <link rel="stylesheet" type="text/css" href="includes/CSS/general_styling.css" />    
 </head>
 <body>
+    <?php include 'includes/read.php'; ?>
 
 <div>
     <h1>Verenigingsoverzicht</h1>
@@ -14,33 +15,33 @@
 <div class="leden-form">     
     <h3>Voeg nieuw lid toe:</h3>
    
-    <form action="includes/add.php" method="POST"><b>
+    <form action="includes/create.php" method="POST"><b>
         <label for="naam">
             Voornaam:
-            <input type="text" name="voornaam">
+            <input type="text" name="voornaam" required>
         </label>
         <label for="achternaam">
             Achternaam:
-            <input type="text" name="achternaam">
+            <input type="text" name="achternaam" required>
         </label>
         <label for="huisnummer">
             Huisnummer:
-            <input type="text" name="huisnummer">
+            <input type="text" name="huisnummer" required>
         </label>
         <label for="postcode">
             Postcode:
-            <select name="postcode">
+            <select name="postcode" required>
                 <option disabled selected value>------</option>
-                <?php include 'includes/select_postcodes.php'; ?>
+                <?php show_postcode_dropdown($conn); ?>
             </select>
         </label>
         <label for="emailadres">
             E-mailadres(sen):
-            <input type="text" name="emailadres" placeholder="Komma's tussen 2 of meer emails">
+            <input type="text" name="emailadres" placeholder="email1@mail.nl, email2@mail.com. email3@mail.nl">
         </label>
         <label for="telnr">
             Telefoonummer(s):
-            <input type="text" name="telnr" placeholder="Komma's tussen 2 of meer telnrs" >
+            <input type="text" name="telnr" placeholder="0611457894, +318826549524" >
         </label></b>
         <button type="submit" name='add_member'>Voeg lid toe</button>
     </form><br>
@@ -51,7 +52,7 @@
 
     <table>
         <tbody>
-            <?php include 'includes/ledenlijst_table.php'; ?>
+            <?php show_member_table($conn); ?>
         </tbody>
     </table>
 </div>

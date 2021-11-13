@@ -29,7 +29,6 @@ if(isset($_POST["add_postcode"]))
 
     $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
     $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
-
     $stmt->execute();
 
     if($stmt->affected_rows != 1)
@@ -44,6 +43,31 @@ if(isset($_POST["add_postcode"]))
 
     $stmt->close();    
 }  
+
+if(isset($_POST['add_telnr']))
+{
+    $telnr = get_post($conn, 'telefoonnummer');
+    $lidnummer = get_post($conn, 'lidnummer');
+
+    echo $telnr;
+    echo $lidnummer;
+
+    $stmt_telnr = $conn->prepare("INSERT INTO telefoonnummers VALUES(?,?)");
+    $stmt_telnr->bind_param('si', $telnr, $lidnummer);
+    $stmt_telnr->execute();
+
+    if($stmt_telnr->affected_rows != 1)
+    { 
+        echo '<script> alert("Telefoonnummer niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
+        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
+    } 
+    else
+    {
+        header("location: ../lid.php?lidnummer=' . $lidnummer . '");
+    }
+
+    $stmt_telnr->close();
+}
 
 function insert_contact_details($conn, $input, $db_table)
 {

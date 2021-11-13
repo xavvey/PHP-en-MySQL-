@@ -9,7 +9,7 @@ function show_member_table($conn)
 
     $select_result = $conn->query($select_query);
     if(!$select_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
-        Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+                                Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
 
     $num_members = $select_result->num_rows;
 
@@ -65,8 +65,12 @@ function show_single_lid($conn)
     
         $select_lid_query = "SELECT * FROM leden 
                                 JOIN postcodes
-                                WHERE lidnummer='$lidnummer'";             
+                                WHERE lidnummer='$lidnummer'";
+
         $select_lid_result = $conn->query($select_lid_query);
+        if(!$select_lid_query) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+                                    Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+
         $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
     
         foreach($gegevens_lid as $data => $info)
@@ -74,7 +78,7 @@ function show_single_lid($conn)
             if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
             {
                 echo '<tr>';
-                echo '<td>' . ucfirst(htmlspecialchars($data)) . '</td>';
+                echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
                 echo '<td>' . htmlspecialchars($info) . '</td>';
                 echo '<td> ---- </td>';
                 echo '<td> ---- </td>';
@@ -83,7 +87,7 @@ function show_single_lid($conn)
             else
             {
                 echo '<tr>';
-                echo '<td>' . ucfirst(htmlspecialchars($data)) . '</td>';
+                echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
                 echo '<td>' . htmlspecialchars($info) . '</td>';
                 echo '<td> update </td>';
                 echo '<td> ---- </td>';
@@ -103,7 +107,7 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
 {
     $subquery = "SELECT * FROM $db_table WHERE lidnummer='$init_row[lidnummer]'";
     $subresult = $connection->query($subquery);
-    if(!$subresult) die ("Er ging iets mis met het ophalen van de contactgegevens. Probeert u het nog een keer.");
+    if(!$subresult) die ("<span style='color:red'>" . "Er ging iets mis met het ophalen van de contactgegevens. Probeert u het nog een keer." . "</span>");
 
     $subrows = $subresult->num_rows;
 
@@ -119,11 +123,11 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
         elseif($usage == 'lid_table')
         {   
             echo '<tr>';
-            if($db_table == 'telefoonnummers') { echo '<td> Telefoonnummer' . " ". $num  . '</td>'; }
-            elseif($db_table == 'emails') { echo '<td> Email' . " ". $num  . '</td>'; }
+            if($db_table == 'telefoonnummers')  { echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>'; }
+            elseif($db_table == 'emails')       { echo '<td><b> Email' . " ". $num  . '</td></b>'; }
             echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
             echo '<td> update </td>';
-            echo '<td> delete </td>';
+            echo '<td><a href="includes/delete.php?telefoonnummer=' . $subrow["telefoonnummer"] . '">Delete</a></td>'; 
             echo '</tr>';
     
             $num += 1;

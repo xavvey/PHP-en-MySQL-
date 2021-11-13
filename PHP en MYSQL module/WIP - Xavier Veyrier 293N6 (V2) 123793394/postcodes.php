@@ -8,7 +8,7 @@
 
 <div>
     <h1>Postcode overzicht</h1>
-    <a href='home_ledenlijst.php' target='blank'>Naar ledenoverzicht</a>
+    <a href='home_ledenlijst.php'>Naar ledenoverzicht</a>
 </div>  
 
 <div class='postcode-form'>
@@ -31,9 +31,11 @@
 </div>
 
 <div>
-    <h3>Ledenoverzicht</h3>
+    <h3>Postcodes:</h3>
 
     <?php 
+    require_once 'includes/connection.php';
+
     $check_postcodes = "SELECT 1 FROM postcodes"; 
     $postcodes_bestaan = $conn->query($check_postcodes);
     if(!$postcodes_bestaan) { echo '<h3>Er staan nog geen postcodes in de database. Voeg eerst een postcode toe.</h3>'; }
@@ -41,26 +43,26 @@
     <table>
         <tbody>
             <tr>
-                <td>Postcode</td>
-                <td>Straat</td>
-                <td>Woonplaats</td>
-                <td>Delete</td>
+                <td>Postcode    </td>
+                <td>Straat      </td>
+                <td>Woonplaats  </td>
+                <td>Delete      </td>
             <tr>
             <?php
             $postcodes_query = "SELECT * FROM postcodes
                                     ORDER BY postcode";
 
             $result = $conn->query($postcodes_query);
-            if(!$result) die ("Kon geen postcodes ophalen van de database. Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw");
+            if(!$result) die ("<span style='color:red'>" . "Kon geen postcodes ophalen van de database. Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw". "</span>");
             $rows = $result->num_rows;
 
             for($j = 0 ; $j < $rows ; ++$j) 
             { 
             $row = $result->fetch_array(MYSQLI_ASSOC); ?>
             <tr>
-                <td><?php echo htmlspecialchars($row["postcode"]) ?></td>
-                <td><?php echo htmlspecialchars($row["adres"]) ?></td>
-                <td><?php echo htmlspecialchars($row["woonplaats"]) ?></td>
+                <td><?php echo htmlspecialchars($row["postcode"]) ?>    </td>
+                <td><?php echo htmlspecialchars($row["adres"]) ?>       </td>
+                <td><?php echo htmlspecialchars($row["woonplaats"]) ?>  </td>
                 <td><?php echo '<a href="includes/delete.php?postcode=' . $row["postcode"] . '">Delete</a></td>' ?>
             </tr>
             <?php } ?>

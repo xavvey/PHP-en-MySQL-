@@ -60,10 +60,32 @@ if(isset($_POST['add_telnr']))
     } 
     else
     {
-        header("location: ../lid.php?lidnummer=' . $lidnummer . '");
+        header("location: ../lid.php?lidnummer=$lidnummer");
     }
 
     $stmt_telnr->close();
+}
+
+if(isset($_POST['add_email']))
+{
+    $email = get_post($conn, 'email');
+    $lidnummer = get_post($conn, 'lidnummer');
+
+    $stmt_email = $conn->prepare("INSERT INTO emails VALUES(?,?)");
+    $stmt_email->bind_param('si', $email, $lidnummer);
+    $stmt_email->execute();
+
+    if($stmt_email->affected_rows != 1)
+    { 
+        echo '<script> alert("Emailadres niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
+        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
+    } 
+    else
+    {
+        header("location: ../lid.php?lidnummer=$lidnummer");
+    }
+
+    $stmt_email->close();
 }
 
 function insert_contact_details($conn, $input, $db_table)

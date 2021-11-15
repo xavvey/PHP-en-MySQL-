@@ -12,9 +12,9 @@
 </div>
 
 <?php
-include 'includes/read.php'; 
 if(isset($_GET['lidnummer'])) 
 { 
+    include 'includes/read.php'; 
     $lidnummer = $_GET['lidnummer'];
 ?>
 <div class="contact-form">     
@@ -32,6 +32,7 @@ if(isset($_GET['lidnummer']))
             Email:
             <input type="text" name="email">
         </label>
+        <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
         <button type="submit" name='add_email'>Voeg email toe</button></b>
     </form><br>
 </div>

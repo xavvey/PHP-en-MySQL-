@@ -118,13 +118,22 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
         elseif($usage == 'lid_table')
         {   
             echo '<tr>';
-            if($db_table == 'telefoonnummers')  { echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>'; }
-            elseif($db_table == 'emails')       { echo '<td><b> Email' . " ". $num  . '</td></b>'; }
+            if($db_table == 'telefoonnummers')
+            { 
+                echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>'; 
+                echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
+                echo '<td> update </td>';
+                echo '<td><a href="includes/delete.php?telefoonnummer=' . $subrow["telefoonnummer"] . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
+                echo '</tr>';
+            }
+            elseif($db_table == 'emails') 
+            { 
+            echo '<td><b> Email' . " ". $num  . '</td></b>'; 
             echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
             echo '<td> update </td>';
-            echo '<td><a href="includes/delete.php?telefoonnummer=' . $subrow["telefoonnummer"] . '">Delete</a></td>'; 
+            echo '<td><a href="includes/delete.php?email=' . $subrow["email"] . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
             echo '</tr>';
-    
+            }
             $num += 1;
         }
     } 

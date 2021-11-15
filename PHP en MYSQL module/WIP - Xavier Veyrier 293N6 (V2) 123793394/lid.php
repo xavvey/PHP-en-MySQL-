@@ -42,10 +42,10 @@ if(isset($_GET['lidnummer']))
     <table>
         <tbody>
             <tr>
-                <td>#</td>
-                <td>Info</td>
-                <td>Pas aan</td>
-                <td>Delete</td>
+                <th>#</th>
+                <th>Info</th>
+                <th>Pas aan</th>
+                <th>Delete</th>
             </tr>
             <?php show_single_lid($conn, $lidnummer); ?>          
         </tbody>

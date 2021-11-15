@@ -12,7 +12,7 @@
 
 select,
 label,
-input {
+.contact-form input {
   display: block;
 }
 

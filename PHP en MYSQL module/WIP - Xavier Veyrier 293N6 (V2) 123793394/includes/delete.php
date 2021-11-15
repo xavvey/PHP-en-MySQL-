@@ -45,13 +45,13 @@ if(isset($_GET['telefoonnummer']))
     echo $telefoonnummer;
     echo $lidnummer;
 
-    // $del_tel_query = "DELETE FROM telefoonnummers WHERE telefoonnummer='$telefoonnummer'";
-    // $del_tel_result = $conn->query($del_tel_query);
-    // if(!$del_tel_result) die ("<span style='color:red'>" . "Verwijderen van telefoonnummer mislukt. Probeert u het opnieuw<br>" . "</span>");
+    $del_tel_query = "DELETE FROM telefoonnummers WHERE telefoonnummer='$telefoonnummer'";
+    $del_tel_result = $conn->query($del_tel_query);
+    if(!$del_tel_result) die ("<span style='color:red'>" . "Verwijderen van telefoonnummer mislukt. Probeert u het opnieuw<br>" . "</span>");
 
-    // header("location: ../lid.php?lidnummer=' . $lidnummer . '");
+    header("location: ../lid.php?lidnummer='" . $lidnummer  . ");
 
-    // $del_tel_result->close();
+    $del_tel_result->close();
 }
 
 $conn->close();

@@ -11,6 +11,12 @@
     <a href='home_ledenlijst.php'>Naar ledenoverzicht</a><br>
 </div>
 
+<?php
+include 'includes/read.php'; 
+if(isset($_GET['lidnummer'])) 
+{ 
+    $lidnummer = $_GET['lidnummer'];
+?>
 <div class="contact-form">     
     <h3>Voeg contactgegevens toe:</h3>
     <form action="includes/create.php" method="POST"><b>
@@ -18,7 +24,7 @@
             Telefoonnummer:
             <input type="text" name="telefoonnummer">
         </label>
-        <input type='hidden' name='lidnummer' value='<?php $_GET['lidnummer'] ?>'>
+        <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
         <button type="submit" name='add_telnr'>Voeg telnr toe</button>
     </form><br>
     <form action="includes/create.php" method="POST">        
@@ -40,13 +46,11 @@
                 <td>Pas aan</td>
                 <td>Delete</td>
             </tr>
-            <?php 
-            include 'includes/read.php';
-            show_single_lid($conn);
-            ?>          
+            <?php show_single_lid($conn, $lidnummer); ?>          
         </tbody>
     </table>
 </div>
+<?php } ?>
 
 
 </body>

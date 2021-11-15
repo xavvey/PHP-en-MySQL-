@@ -49,9 +49,6 @@ if(isset($_POST['add_telnr']))
     $telnr = get_post($conn, 'telefoonnummer');
     $lidnummer = get_post($conn, 'lidnummer');
 
-    echo $telnr;
-    echo $lidnummer;
-
     $stmt_telnr = $conn->prepare("INSERT INTO telefoonnummers VALUES(?,?)");
     $stmt_telnr->bind_param('si', $telnr, $lidnummer);
     $stmt_telnr->execute();

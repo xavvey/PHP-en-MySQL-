@@ -57,50 +57,45 @@ function show_member_table($conn)
     $conn->close();
 }
 
-function show_single_lid($conn)
+function show_single_lid($conn, $lidnummer)
 {
-    if(isset($_GET['lidnummer']))
-    { 
-        $lidnummer = $_GET['lidnummer']; 
-    
-        $select_lid_query = "SELECT * FROM leden 
-                                JOIN postcodes
-                                WHERE lidnummer='$lidnummer'";
+    $select_lid_query = "SELECT * FROM leden 
+                            JOIN postcodes
+                            WHERE lidnummer='$lidnummer'";
 
-        $select_lid_result = $conn->query($select_lid_query);
-        if(!$select_lid_query) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
-                                    Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+    $select_lid_result = $conn->query($select_lid_query);
+    if(!$select_lid_query) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+                                Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
 
-        $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
-    
-        foreach($gegevens_lid as $data => $info)
+    $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
+
+    foreach($gegevens_lid as $data => $info)
+    {
+        if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
         {
-            if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
-            {
-                echo '<tr>';
-                echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
-                echo '<td>' . htmlspecialchars($info) . '</td>';
-                echo '<td> ---- </td>';
-                echo '<td> ---- </td>';
-                echo '</tr>';
-            } 
-            else
-            {
-                echo '<tr>';
-                echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
-                echo '<td>' . htmlspecialchars($info) . '</td>';
-                echo '<td> update </td>';
-                echo '<td> ---- </td>';
-                echo '</tr>';
-            }
+            echo '<tr>';
+            echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
+            echo '<td>' . htmlspecialchars($info) . '</td>';
+            echo '<td> ---- </td>';
+            echo '<td> ---- </td>';
+            echo '</tr>';
+        } 
+        else
+        {
+            echo '<tr>';
+            echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
+            echo '<td>' . htmlspecialchars($info) . '</td>';
+            echo '<td> update </td>';
+            echo '<td> ---- </td>';
+            echo '</tr>';
         }
+    }
 
-        toon_contactgegevens('telefoonnummers', $gegevens_lid, $conn, 'telefoonnummer', 'lid_table');
-        toon_contactgegevens('emails', $gegevens_lid, $conn, 'email', 'lid_table');
+    toon_contactgegevens('telefoonnummers', $gegevens_lid, $conn, 'telefoonnummer', 'lid_table');
+    toon_contactgegevens('emails', $gegevens_lid, $conn, 'email', 'lid_table');
 
-        $select_lid_result->close();
-        $conn->close();
-    } 
+    $select_lid_result->close();
+    $conn->close();
 }
 
 function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $usage)

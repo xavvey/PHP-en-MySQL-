@@ -18,6 +18,7 @@ if(isset($_POST["add_member"]))
     insert_contact_details($conn, $emails, 'emails');
 
     header("location: ../home_ledenlijst.php");
+
     $stmt_lid->close();
 }
 
@@ -101,6 +102,8 @@ function insert_contact_details($conn, $input, $db_table)
             $stmt->bind_param('s', $contact,);
             $stmt->execute();
         }
+
+        $stmt->close();
     }
 }
 

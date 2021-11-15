@@ -64,29 +64,49 @@ function show_single_lid($conn, $lidnummer)
                             WHERE lidnummer='$lidnummer'";
 
     $select_lid_result = $conn->query($select_lid_query);
-    if(!$select_lid_query) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+    if(!$select_lid_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
                                 Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
 
     $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
+    print_r($gegevens_lid);
+    echo '<br>';
+    print_r($_GET);
+    echo '<br>';
+    print_r(array_keys($_GET));
 
     foreach($gegevens_lid as $data => $info)
     {
-        if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
+        // The part after the first if() doesn't work-> it changes all rows, I know
+        if($gegevens_lid[$data] == array_keys($_GET))
         {
             echo '<tr>';
+            echo '<form action="update.php method="POST"';
             echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
-            echo '<td>' . htmlspecialchars($info) . '</td>';
-            echo '<td> ---- </td>';
-            echo '<td> ---- </td>';
+            echo '<td><input type="text" name="' . $data . '" value="' . $gegevens_lid[$info] . '"></td>';
+            echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
+            echo '<td><button type="submit">Save</button></td>';
+            echo '</form>';
             echo '</tr>';
-        } 
+        }
         else
         {
             echo '<tr>';
-            echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
-            echo '<td>' . htmlspecialchars($info) . '</td>';
-            echo '<td> update </td>';
-            echo '<td> ---- </td>';
+            if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
+            {
+                
+                echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
+                echo '<td>' . htmlspecialchars($info) . '</td>';
+                echo '<td> ---- </td>';
+                echo '<td> ---- </td>';
+                
+            } 
+            else
+            {
+                echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
+                echo '<td>' . htmlspecialchars($info) . '</td>';
+                echo '<td><a href="lid.php?lidnummer=' . $gegevens_lid['lidnummer'] . '&' . $data . '=' . $info . '">Update</td>';
+                echo '<td> ---- </td>';
+            }
             echo '</tr>';
         }
     }
@@ -122,7 +142,7 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
             { 
                 echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>'; 
                 echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
-                echo '<td> update </td>';
+                echo '<td><a href="lid.php?lidnummer=' . $init_row['lidnummer'] . '&telefoonnummer=' . $subrow['telefoonnummer'] . '">Update</td>';
                 echo '<td><a href="includes/delete.php?telefoonnummer=' . $subrow["telefoonnummer"] . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
                 echo '</tr>';
             }
@@ -130,7 +150,7 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
             { 
             echo '<td><b> Email' . " ". $num  . '</td></b>'; 
             echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
-            echo '<td> update </td>';
+            echo '<td><a href="lid.php?lidnummer=' . $init_row['lidnummer'] . '&email=' . $subrow['email'] . '">Update</td>';
             echo '<td><a href="includes/delete.php?email=' . $subrow["email"] . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
             echo '</tr>';
             }

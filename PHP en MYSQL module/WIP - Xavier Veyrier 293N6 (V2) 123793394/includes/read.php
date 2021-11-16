@@ -4,8 +4,8 @@ require_once __DIR__ .'../connection.php';
 function show_member_table($conn)
 {
     $select_query = "SELECT * FROM leden  
-    NATURAL JOIN postcodes
-    ORDER BY lidnummer";
+                        NATURAL JOIN postcodes
+                        ORDER BY lidnummer";
 
     $select_result = $conn->query($select_query);
     if(!$select_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
@@ -60,7 +60,7 @@ function show_member_table($conn)
 function show_single_lid($conn, $lidnummer)
 {
     $select_lid_query = "SELECT * FROM leden 
-                            JOIN postcodes
+                            NATURAL JOIN postcodes
                             WHERE lidnummer='$lidnummer'";
 
     $select_lid_result = $conn->query($select_lid_query);
@@ -69,23 +69,33 @@ function show_single_lid($conn, $lidnummer)
 
     $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
 
-    // Gets current url and converts 'query' to index array
+    // parses url to check which row in member table is clicked on -> function below
     $current_url = parse_url(curPageURL());
     parse_str($current_url['query'], $url_params_assoc);
+    $url_param_keys = array_keys($url_params_assoc);
     $url_param_index = array_values($url_params_assoc);
 
     foreach($gegevens_lid as $data => $info)
     {
         echo '<tr>';
-        echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>'; 
-        if($url_param_index[1] == $info) // Checks if second url-parameter is same as $info on row that is clicked on and changes cell to form input field
-        {       
-            echo '<form action="update.php method="POST"';                  
-            echo '<td><input type="text" name="' . $data . '" value="' . $info . '"></td>';
+        echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
+        if($url_param_index[1] == $info) 
+        { 
+            echo '<td><form action="includes/update.php" method="POST"';                  
+            echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
             echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
             echo '<td><button type="submit">Save</button></td>';
             echo '<td>----</td>';
-            echo '</form>';
+            echo '</form></td>';
+        }
+        elseif($url_param_keys[1] == 'postcode' && $url_param_index[1] == $info)
+        {
+            echo '<td><form action="includes/update.php" method="POST"';                  
+            echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
+            echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
+            echo '<td><button type="submit">Save</button></td>';
+            echo '<td>----</td>';
+            echo '</form></td>';
         }
         else
         {
@@ -132,12 +142,12 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
         }
         elseif($usage == 'lid_table')
         {   
-            echo '<tr>';
+            echo '<tr>';    
             if($db_table == 'telefoonnummers')
             { 
                 echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>'; 
                 echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
-                echo '<td><a href="lid.php?lidnummer=' . $init_row['lidnummer'] . '&telefoonnummer=' . $subrow['telefoonnummer'] . '">Update</td>';
+                echo '<td>----</td>';
                 echo '<td><a href="includes/delete.php?telefoonnummer=' . $subrow["telefoonnummer"] . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
                 echo '</tr>';
             }
@@ -145,12 +155,12 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
             { 
                 echo '<td><b> Email' . " ". $num  . '</td></b>'; 
                 echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
-                echo '<td><a href="lid.php?lidnummer=' . $init_row['lidnummer'] . '&email=' . $subrow['email'] . '">Update</td>';
+                echo '<td>----</td>';
                 echo '<td><a href="includes/delete.php?email=' . $subrow["email"] . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
                 echo '</tr>';
             }
-            $num += 1;
         }
+        $num += 1;
     } 
 }
 

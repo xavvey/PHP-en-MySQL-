@@ -37,11 +37,11 @@
         </label>
         <label for="emailadres">
             E-mailadres(sen):
-            <input type="text" name="emailadres" placeholder="email1@mail.nl, email2@mail.com. email3@mail.nl">
+            <input type="email" name="emailadres" placeholder="email1@mail.nl, email2@mail.com. email3@mail.nl" multiple>
         </label>
         <label for="telnr">
             Telefoonummer(s):
-            <input type="text" name="telnr" placeholder="0611457894, +318826549524" >
+            <input type="text" name="telnr" placeholder="0611457894, +318826549524" multiple>
         </label></b>
         <button type="submit" name='add_member'>Voeg lid toe</button>
     </form><br>

@@ -14,10 +14,10 @@
 <div class='postcode-form'>
     <h3>Voeg nieuwe postcode toe</h3>
 
-    <form action="includes/add.php" method="POST"><b>
+    <form action="includes/create.php" method="POST"><b>
         <label for="postcode">
             Postcode:
-            <input type="text" name="postcode" pattern='^[1-9][0-9]{3}[\s]?[A-Za-z]{2}' placeholder="1234AB" required>
+            <input type="text" name="postcode" pattern='^[1-9][0-9]{3}?[A-Z]{2}' placeholder="1234AB" required>
         </label>
         <label for="straat">
             Straat:

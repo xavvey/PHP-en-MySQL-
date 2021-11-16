@@ -20,6 +20,7 @@ if(isset($_POST["add_member"]))
     header("location: ../home_ledenlijst.php");
 
     $stmt_lid->close();
+    $conn->close();
 }
 
 if(isset($_POST["add_postcode"]))
@@ -42,7 +43,8 @@ if(isset($_POST["add_postcode"]))
         header("location: ../postcodes.php");
     }
 
-    $stmt->close();    
+    $stmt->close();
+    $conn->close();    
 }  
 
 if(isset($_POST['add_telnr']))
@@ -65,6 +67,7 @@ if(isset($_POST['add_telnr']))
     }
 
     $stmt_telnr->close();
+    $conn->close();
 }
 
 if(isset($_POST['add_email']))
@@ -87,6 +90,7 @@ if(isset($_POST['add_email']))
     }
 
     $stmt_email->close();
+    $conn->close();
 }
 
 function insert_contact_details($conn, $input, $db_table)
@@ -104,6 +108,7 @@ function insert_contact_details($conn, $input, $db_table)
         }
 
         $stmt->close();
+        $conn->close();
     }
 }
 

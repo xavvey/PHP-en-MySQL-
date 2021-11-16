@@ -1,9 +1,10 @@
+.postcode-form,
 .contact-form,
 .leden-form {
   width: 240px;
   clear: both;
 }
-
+.postcode-form input,
 .contact-form input,
 .leden-form input, select {
   width: 140%;

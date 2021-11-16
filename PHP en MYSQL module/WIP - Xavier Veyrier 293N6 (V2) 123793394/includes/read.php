@@ -69,13 +69,18 @@ function show_single_lid($conn, $lidnummer)
 
     $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
 
+    // Gets current url and converts 'query' to index array
+    $current_url = parse_url(curPageURL());
+    parse_str($current_url['query'], $url_params_assoc);
+    $url_param_index = array_values($url_params_assoc);
+
     foreach($gegevens_lid as $data => $info)
     {
         echo '<tr>';
-        echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
-        if(count($_GET) > 1)
-        {          
-            echo '<form action="update.php method="POST"';          
+        echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>'; 
+        if($url_param_index[1] == $info) // Checks if second url-parameter is same as $info on row that is clicked on and changes cell to form input field
+        {       
+            echo '<form action="update.php method="POST"';                  
             echo '<td><input type="text" name="' . $data . '" value="' . $info . '"></td>';
             echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
             echo '<td><button type="submit">Save</button></td>';
@@ -172,4 +177,18 @@ function show_postcode_dropdown($conn)
         echo "<option value='$postcode'>" . $postcode . " - " . $straat . " - " . $woonplaats . "</option>"; 
     }
 }
+
+function curPageURL() 
+{
+    $pageURL = 'http';
+    if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+    $pageURL .= "://";
+    if ($_SERVER["SERVER_PORT"] != "80") {
+     $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+    } else {
+     $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+    }
+    return $pageURL;
+}
+
 ?>

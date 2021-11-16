@@ -12,10 +12,12 @@
 </div>
 
 <?php
+include 'includes/read.php'; 
+
 if(isset($_GET['lidnummer'])) 
 { 
-    include 'includes/read.php'; 
     $lidnummer = $_GET['lidnummer'];
+}
 ?>
 <div class="contact-form">     
     <h3>Voeg contactgegevens toe:</h3>
@@ -51,7 +53,7 @@ if(isset($_GET['lidnummer']))
         </tbody>
     </table>
 </div>
-<?php } ?>
+
 
 
 </body>

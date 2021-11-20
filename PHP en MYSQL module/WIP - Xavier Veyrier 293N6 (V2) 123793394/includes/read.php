@@ -1,6 +1,17 @@
 <?php
 require_once __DIR__ .'../connection.php';
 
+function read_db_tables($conn)
+{
+    $show_tables_query = "SHOW TABLES FROM vereniging";
+    $show_tables_result = $conn->query($show_tables_query);
+    if(!$show_tables_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+    Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+
+    $num_tables = $show_tables_result->num_rows;
+    return $num_tables;
+}
+
 function show_member_table($conn)
 {
     $select_query = "SELECT * FROM leden  

@@ -8,7 +8,7 @@
 
 <div>
     <h1>Update lid</h1>
-    <a href='home_ledenlijst.php'>Naar ledenoverzicht</a><br>
+    <a href='index.php'>Naar ledenoverzicht</a><br>
     <a href='postcodes.php'>Naar postcode overzicht</a>
 </div>
 

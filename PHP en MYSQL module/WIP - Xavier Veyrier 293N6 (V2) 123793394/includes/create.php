@@ -17,7 +17,7 @@ if(isset($_POST["add_member"]))
     insert_contact_details($conn, $telnrs, 'telefoonnummers');
     insert_contact_details($conn, $emails, 'emails');
 
-    header("location: ../home_ledenlijst.php");
+    header("location: ../index.php");
 
     $stmt_lid->close();
     $conn->close();

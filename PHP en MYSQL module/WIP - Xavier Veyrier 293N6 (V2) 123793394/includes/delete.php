@@ -44,7 +44,7 @@ elseif(isset($_GET['lidnummer']))
     $del_lid_result = $conn->query($del_lid_query);
     if(!$del_lid_result) die ("<span style='color:red'>" . "Verwijderen van leden mislukt. <br>" . "</span>");   
 
-    header("location: ../home_ledenlijst.php");
+    header("location: ../index.php");
 
     $del_telnrs_result->close();
     $del_mails_result->close();

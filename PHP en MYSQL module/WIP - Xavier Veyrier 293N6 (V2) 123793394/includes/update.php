@@ -67,7 +67,29 @@ if(isset($_POST['huisnummer']))
     $stmt_huisnummer->close();    
 }
 
-if(isset($_POST['postcode']))
+if(isset($_POST['postcode']) && isset($_POST['adres']) && isset($_POST['woonplaats']))
+{
+    $postcode = get_post($conn, 'postcode');
+    $adres = get_post($conn, 'adres');
+    $woonplaats = get_post($conn, 'woonplaats');
+
+    $stmt_postcode = $conn->prepare('UPDATE postcodes SET adres=?, woonplaats=? WHERE postcode=?');
+    $stmt_postcode->bind_param('sss', $adres, $woonplaats, $postcode);
+    $stmt_postcode->execute();
+
+    if($stmt_postcode->affected_rows != 1)
+    {
+        echo '<script> alert("Postcode niet aangepast. Controleer de gegevens en probeer het opnieuw") </script>';
+        echo '<script> window.history.go(-1) </script>';         
+    } 
+    else
+    {
+        header("location: ../postcodes.php");
+    }
+    
+    $stmt_postcode->close();  
+}
+elseif(isset($_POST['postcode']))
 {
     $lidnummer = get_post($conn, 'lidnummer');
     $postcode = get_post($conn, 'postcode');

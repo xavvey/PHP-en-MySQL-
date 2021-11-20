@@ -25,7 +25,7 @@ if(isset($_GET['lidnummer']))
     <form action="includes/create.php" method="POST"><b>
         <label for="telefoonnummer">
             Telefoonnummer:
-            <input type="text" name="telefoonnummer">
+            <input type="text" name="telefoonnummer" required>
         </label>
         <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
         <button type="submit" name='add_telnr'>Voeg telnr toe</button>
@@ -33,7 +33,7 @@ if(isset($_GET['lidnummer']))
     <form action="includes/create.php" method="POST">        
         <label for="email">
             Email:
-            <input type="text" name="email">
+            <input type="email" name="email" required>
         </label>
         <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
         <button type="submit" name='add_email'>Voeg email toe</button></b>

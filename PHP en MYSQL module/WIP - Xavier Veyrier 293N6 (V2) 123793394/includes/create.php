@@ -35,8 +35,8 @@ if(isset($_POST["add_postcode"]))
 
     if($stmt->affected_rows != 1)
     { 
-        echo '<script> alert("Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
-        echo '<script> window.location.href = "../postcodes.php" </script>';         
+        echo '<script> alert("Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en probeer het opnieuw.") </script>';
+        echo '<script> window.history.go(-1) </script>';          
     } 
     else
     {

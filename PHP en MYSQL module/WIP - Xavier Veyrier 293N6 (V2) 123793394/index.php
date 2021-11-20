@@ -9,9 +9,6 @@
 <?php 
 include 'includes/read.php';
 
-// if($conn->connect_error()) { die ("<span style='color:red'>" . "Er is iets mis gegaan met het tot stand brengen van de verbinding met de database. 
-// Controleer of u de juiste database wilt bereiken, of deze bestaat en of uw inloggegevens kloppen" . "</span>");}
-// else
 if(read_db_tables($conn) == 0) {echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; }
 else {
 ?>

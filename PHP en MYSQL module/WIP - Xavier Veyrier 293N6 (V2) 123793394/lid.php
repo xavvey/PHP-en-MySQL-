@@ -47,7 +47,6 @@ if(isset($_GET['lidnummer']))
             <tr>
                 <th>#</th>
                 <th>Info</th>
-                <th>Pas aan</th>
                 <th>Delete</th>
             </tr>
             <?php show_single_lid($conn, $lidnummer); ?>          

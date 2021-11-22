@@ -5,7 +5,7 @@ if(isset($_POST['naam']))
 {
     $lidnummer = get_post($conn, 'lidnummer');
     $naam = get_post($conn, 'naam');
-    
+
     $stmt_naam = $conn->prepare('UPDATE leden SET naam=? WHERE lidnummer=?');
     $stmt_naam->bind_param('si', $naam, $lidnummer);
     $stmt_naam->execute(); 

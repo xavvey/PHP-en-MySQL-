@@ -42,16 +42,19 @@ if(isset($_GET['lidnummer']))
 
 <div>
     <h3>Lid:</h3>
-    <table>
-        <tbody>
-            <tr>
-                <th>#</th>
-                <th>Info</th>
-                <th>Delete</th>
-            </tr>
-            <?php show_single_lid($conn, $lidnummer); ?>          
-        </tbody>
-    </table>
+    <form action="includes/update.php" method="POST">
+        <table>
+            <tbody>
+                <tr>
+                    <th>#</th>
+                    <th>Info</th>
+                    <th>Delete</th>
+                </tr>
+                <?php show_single_lid($conn, $lidnummer); ?>
+                <td colspan="3" ><button type="submit">Save</button></td>          
+            </tbody>
+        </table>
+    </form>
 </div>
 
 

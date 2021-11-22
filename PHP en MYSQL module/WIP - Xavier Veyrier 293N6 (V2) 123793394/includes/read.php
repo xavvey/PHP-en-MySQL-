@@ -92,7 +92,7 @@ function show_single_lid($conn, $lidnummer)
         echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
         // if($url_param_index[1] == $info) 
         // { 
-        //     echo '<td><form action="includes/update.php" method="POST"';                  
+        //     echo '<td><form action="includes/update.php" method="POST">';                  
         //     echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
         //     echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
         //     echo '<td><button type="submit">Save</button></td>';

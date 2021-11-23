@@ -39,3 +39,7 @@ tr:nth-child(even) {
   background-color: #dddddd;
 }
 
+td[colspan="3"] {
+  text-align: center;
+}
+

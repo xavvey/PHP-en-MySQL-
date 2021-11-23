@@ -80,53 +80,28 @@ function show_single_lid($conn, $lidnummer)
 
     $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
 
-    // parses url to check which row in member table is clicked on -> function below
-    // $current_url = parse_url(curPageURL());
-    // parse_str($current_url['query'], $url_params_assoc);
-    // $url_param_keys = array_keys($url_params_assoc);
-    // $url_param_index = array_values($url_params_assoc);
-
     foreach($gegevens_lid as $data => $info)
     {
         echo '<tr>';
         echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
-        // if($url_param_index[1] == $info) 
-        // { 
-        //     echo '<td><form action="includes/update.php" method="POST">';                  
-        //     echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
-        //     echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
-        //     echo '<td><button type="submit">Save</button></td>';
-        //     echo '<td>----</td>';
-        //     echo '</form></td>';
-        // }
-        // elseif($url_param_keys[1] == 'postcode' && $url_param_index[1] == $info)
-        // {
-        //     echo '<td><form action="includes/update.php" method="POST"';                  
-        //     echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
-        //     echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
-        //     echo '<td><button type="submit">Save</button></td>';
-        //     echo '<td>----</td>';
-        //     echo '</form></td>';
-        // }
-        // else
-        // {
-            if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
-            {
-                echo '<td>' . htmlspecialchars($info) . '</td>';
-                echo '<td> ---- </td>';
-                
-            } 
-            elseif($data == 'postcode')
-            {
-                echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
-                echo '<td> ---- </td>';
-            }
-            else
-            {
-                echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
-                echo '<td> ---- </td>';
-            }            
-        // }
+        
+        if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
+        {
+            echo '<td>' . htmlspecialchars($info) . '</td>';
+            echo '<td> ---- </td>';
+            
+        } 
+        elseif($data == 'postcode')
+        {
+            echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
+            echo '<td> ---- </td>';
+        }
+        else
+        {
+            echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
+            echo '<td> ---- </td>';
+        }            
+        echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">'; 
         echo '</tr>';
     }
 

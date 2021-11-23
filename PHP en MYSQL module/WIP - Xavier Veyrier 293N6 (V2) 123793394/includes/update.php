@@ -1,70 +1,37 @@
 <?php
 require_once __DIR__ .'../connection.php';
 
-if(isset($_POST['naam']))
+if(isset($_POST['lidnummer']))
 {
     $lidnummer = get_post($conn, 'lidnummer');
-    $naam = get_post($conn, 'naam');
 
-    $stmt_naam = $conn->prepare('UPDATE leden SET naam=? WHERE lidnummer=?');
-    $stmt_naam->bind_param('si', $naam, $lidnummer);
-    $stmt_naam->execute(); 
-    
-    if($stmt_naam->affected_rows != 1)
+    $num_data_affected = 0;
+    foreach($_POST as $data => $info)
     {
-        echo '<script> alert("Naam niet aangepast. Controleer of deze hetzelfde is of probeer het opnieuw.") </script>';
-        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
-    } 
-    else
-    {
-        header("location: ../lid.php?lidnummer=$lidnummer");
+        $info = get_post($conn, $data);
+
+        if($data != 'lidnummer')
+        {
+            $stmt_data = $conn->prepare('UPDATE leden SET '. $data . '=? WHERE lidnummer=?');
+            $stmt_data->bind_param('si', $info, $lidnummer);
+            $stmt_data->execute();
+
+            $affected = $stmt_data->affected_rows;
+        }       
+        $num_data_affected += $affected;
     }
     
-    $stmt_naam->close();    
-}
-
-if(isset($_POST['voornaam']))
-{
-    $lidnummer = get_post($conn, 'lidnummer');
-    $voornaam = get_post($conn, 'voornaam');
-    
-    $stmt_voornaam = $conn->prepare('UPDATE leden SET voornaam=? WHERE lidnummer=?');
-    $stmt_voornaam->bind_param('si', $voornaam, $lidnummer);
-    $stmt_voornaam->execute(); 
-    
-    if($stmt_voornaam->affected_rows != 1)
+    if($num_data_affected < 1)
     {
-        echo '<script> alert("Voornaam niet aangepast. Controleer of deze hetzelfde is of probeer het opnieuw.") </script>';
-        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
-    } 
+        echo '<script> alert("Het lijkt erop dat niets gewijzigd is. Controleer alle gegevens. Ook of de postcode die u eventueel wilt toevoegen al bestaat. Probeer het opnieuw.") </script>';
+        echo '<script> window.history.go(-1) </script>'; 
+    }
     else
     {
-        header("location: ../lid.php?lidnummer=$lidnummer");
+        echo '<script> alert("Gegevens aangepast. U kunt verder gaan met wijzigen of naar een andere pagina gaan.") </script>';
+        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';  
     }
-    
-    $stmt_voornaam->close();    
-}
-
-if(isset($_POST['huisnummer']))
-{
-    $lidnummer = get_post($conn, 'lidnummer');
-    $huisnummer = get_post($conn, 'huisnummer');
-    
-    $stmt_huisnummer = $conn->prepare('UPDATE leden SET huisnummer=? WHERE lidnummer=?');
-    $stmt_huisnummer->bind_param('si', $huisnummer, $lidnummer);
-    $stmt_huisnummer->execute(); 
-    
-    if($stmt_huisnummer->affected_rows != 1)
-    {
-        echo '<script> alert("Huisnummer niet aangepast. Controleer of deze hetzelfde is of probeer het opnieuw.") </script>';
-        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
-    } 
-    else
-    {
-        header("location: ../lid.php?lidnummer=$lidnummer");
-    }
-    
-    $stmt_huisnummer->close();    
+    $stmt_data->close();
 }
 
 if(isset($_POST['postcode']) && isset($_POST['adres']) && isset($_POST['woonplaats']))
@@ -88,27 +55,6 @@ if(isset($_POST['postcode']) && isset($_POST['adres']) && isset($_POST['woonplaa
     }
     
     $stmt_postcode->close();  
-}
-elseif(isset($_POST['postcode']))
-{
-    $lidnummer = get_post($conn, 'lidnummer');
-    $postcode = get_post($conn, 'postcode');
-    
-    $stmt_postcode = $conn->prepare('UPDATE leden SET postcode=? WHERE lidnummer=?');
-    $stmt_postcode->bind_param('si', $postcode, $lidnummer);
-    $stmt_postcode->execute(); 
-    
-    if($stmt_postcode->affected_rows != 1)
-    {
-        echo '<script> alert("Postcode niet aangepast. Controleer of deze voldoet aan format 1234AB , of de postcode al is toegevoegd, of probeer het opnieuw") </script>';
-        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
-    } 
-    else
-    {
-        header("location: ../lid.php?lidnummer=$lidnummer");
-    }
-    
-    $stmt_postcode->close();    
 }
 
 function get_post($conn, $var)

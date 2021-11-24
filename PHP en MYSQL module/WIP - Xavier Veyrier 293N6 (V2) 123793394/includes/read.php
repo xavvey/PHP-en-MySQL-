@@ -134,14 +134,16 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
             echo '<tr>';    
             if($db_table == 'telefoonnummers')
             { 
-                echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>'; 
-                echo '<td><input type="text" name="telefoonnummer' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" required></td>';
+                echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>';
+                echo '<input type="hidden" name="num-telnrs" value="' . $num . '">';  
+                echo '<td><input type="text" name="telefoonnummer' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" maxlength="13" required></td>';
                 echo '<input type="hidden" name="oud-telnr' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '">'; 
                 echo '<td><a href="includes/delete.php?telefoonnummer=' . rawurlencode($subrow["telefoonnummer"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>';                
             }
             elseif($db_table == 'emails') 
             { 
-                echo '<td><b> Email' . " ". $num  . '</td></b>'; 
+                echo '<td><b> Email' . " ". $num  . '</td></b>';
+                echo '<input type="hidden" name="num-emails" value="' . $num . '">';  
                 echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
                 echo '<td><a href="includes/delete.php?email=' . rawurlencode($subrow["email"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
             }

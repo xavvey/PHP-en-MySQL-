@@ -25,7 +25,7 @@ if(isset($_GET['lidnummer']))
     <form action="includes/create.php" method="POST"><b>
         <label for="telefoonnummer">
             Telefoonnummer:
-            <input type="text" name="telefoonnummer" required>
+            <input type="text" name="telefoonnummer" maxlength="13" required>
         </label>
         <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
         <button type="submit" name='add_telnr'>Voeg telnr toe</button>

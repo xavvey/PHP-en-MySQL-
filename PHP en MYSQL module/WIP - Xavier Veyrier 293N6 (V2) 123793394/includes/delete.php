@@ -2,7 +2,7 @@
 require_once __DIR__ . '../connection.php';
 
 if(isset($_GET['telefoonnummer']) && isset($_GET['lidnummer']))
-{
+{   
     $telefoonnummer = $_GET['telefoonnummer'];
     $lidnummer = $_GET['lidnummer'];
 

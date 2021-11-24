@@ -71,7 +71,7 @@ function show_member_table($conn)
 function show_single_lid($conn, $lidnummer)
 {
     $select_lid_query = "SELECT * FROM leden 
-                            NATURAL JOIN postcodes
+                            INNER JOIN postcodes ON postcodes.postcode = leden.postcode
                             WHERE lidnummer='$lidnummer'";
 
     $select_lid_result = $conn->query($select_lid_query);
@@ -80,50 +80,28 @@ function show_single_lid($conn, $lidnummer)
 
     $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
 
-    // parses url to check which row in member table is clicked on -> function below
-    $current_url = parse_url(curPageURL());
-    parse_str($current_url['query'], $url_params_assoc);
-    $url_param_keys = array_keys($url_params_assoc);
-    $url_param_index = array_values($url_params_assoc);
-
     foreach($gegevens_lid as $data => $info)
     {
         echo '<tr>';
         echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
-        if($url_param_index[1] == $info) 
-        { 
-            echo '<td><form action="includes/update.php" method="POST"';                  
-            echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
-            echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
-            echo '<td><button type="submit">Save</button></td>';
-            echo '<td>----</td>';
-            echo '</form></td>';
-        }
-        elseif($url_param_keys[1] == 'postcode' && $url_param_index[1] == $info)
+        
+        if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
         {
-            echo '<td><form action="includes/update.php" method="POST"';                  
+            echo '<td>' . htmlspecialchars($info) . '</td>';
+            echo '<td> ---- </td>';
+            
+        } 
+        elseif($data == 'postcode')
+        {
             echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
-            echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">';
-            echo '<td><button type="submit">Save</button></td>';
-            echo '<td>----</td>';
-            echo '</form></td>';
+            echo '<td> ---- </td>';
         }
         else
         {
-            if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
-            {
-                echo '<td>' . htmlspecialchars($info) . '</td>';
-                echo '<td> ---- </td>';
-                echo '<td> ---- </td>';
-                
-            } 
-            else
-            {
-                echo '<td>' . htmlspecialchars($info) . '</td>';
-                echo '<td><a href="lid.php?lidnummer=' . $gegevens_lid['lidnummer'] . '&' . $data . '=' . $info . '">Update</td>';
-                echo '<td> ---- </td>';
-            }            
-        }
+            echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
+            echo '<td> ---- </td>';
+        }            
+        echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">'; 
         echo '</tr>';
     }
 
@@ -156,20 +134,21 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
             echo '<tr>';    
             if($db_table == 'telefoonnummers')
             { 
-                echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>'; 
-                echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
-                echo '<td>----</td>';
-                echo '<td><a href="includes/delete.php?telefoonnummer=' . $subrow["telefoonnummer"] . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
-                echo '</tr>';
+                echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>';
+                echo '<input type="hidden" name="num-telnrs" value="' . $num . '">';  
+                echo '<td><input type="text" name="telefoonnummer' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" maxlength="13" required></td>';
+                echo '<input type="hidden" name="oud-telnr' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '">'; 
+                echo '<td><a href="includes/delete.php?telefoonnummer=' . rawurlencode($subrow["telefoonnummer"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>';                
             }
             elseif($db_table == 'emails') 
             { 
-                echo '<td><b> Email' . " ". $num  . '</td></b>'; 
-                echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
-                echo '<td>----</td>';
-                echo '<td><a href="includes/delete.php?email=' . $subrow["email"] . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
-                echo '</tr>';
+                echo '<td><b> Email' . " ". $num  . '</td></b>';
+                echo '<input type="hidden" name="num-emails" value="' . $num . '">';  
+                echo '<td><input type="email" name="email' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" required></td>';
+                echo '<input type="hidden" name="oud-email' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '">'; 
+                echo '<td><a href="includes/delete.php?email=' . rawurlencode($subrow["email"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
             }
+            echo '</tr>';
         }
         $num += 1;
     } 

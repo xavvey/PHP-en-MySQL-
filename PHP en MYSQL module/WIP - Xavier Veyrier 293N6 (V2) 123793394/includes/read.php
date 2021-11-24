@@ -144,7 +144,8 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
             { 
                 echo '<td><b> Email' . " ". $num  . '</td></b>';
                 echo '<input type="hidden" name="num-emails" value="' . $num . '">';  
-                echo '<td>' . htmlspecialchars($subrow[$db_column]) . '</td>';
+                echo '<td><input type="email" name="email' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" required></td>';
+                echo '<input type="hidden" name="oud-email' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '">'; 
                 echo '<td><a href="includes/delete.php?email=' . rawurlencode($subrow["email"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
             }
             echo '</tr>';

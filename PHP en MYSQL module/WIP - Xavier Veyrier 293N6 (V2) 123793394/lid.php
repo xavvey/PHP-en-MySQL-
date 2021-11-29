@@ -25,7 +25,7 @@ if(isset($_GET['lidnummer']))
     <form action="includes/create.php" method="POST"><b>
         <label for="telefoonnummer">
             Telefoonnummer:
-            <input type="text" name="telefoonnummer" required>
+            <input type="text" name="telefoonnummer" maxlength="13" required>
         </label>
         <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
         <button type="submit" name='add_telnr'>Voeg telnr toe</button>
@@ -42,17 +42,19 @@ if(isset($_GET['lidnummer']))
 
 <div>
     <h3>Lid:</h3>
-    <table>
-        <tbody>
-            <tr>
-                <th>#</th>
-                <th>Info</th>
-                <th>Pas aan</th>
-                <th>Delete</th>
-            </tr>
-            <?php show_single_lid($conn, $lidnummer); ?>          
-        </tbody>
-    </table>
+    <form action="includes/update.php" method="POST">
+        <table>
+            <tbody>
+                <tr>
+                    <th>#</th>
+                    <th>Info</th>
+                    <th>Delete</th>
+                </tr>
+                <?php show_single_lid($conn, $lidnummer); ?>
+                <td colspan="3" ><button type="submit">Save</button></td>          
+            </tbody>
+        </table>
+    </form>
 </div>
 
 

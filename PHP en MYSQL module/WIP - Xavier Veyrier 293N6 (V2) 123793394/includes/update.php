@@ -1,70 +1,91 @@
 <?php
 require_once __DIR__ .'../connection.php';
 
-if(isset($_POST['naam']))
+if(isset($_POST['lidnummer']))
 {
     $lidnummer = get_post($conn, 'lidnummer');
-    $naam = get_post($conn, 'naam');
-    
-    $stmt_naam = $conn->prepare('UPDATE leden SET naam=? WHERE lidnummer=?');
-    $stmt_naam->bind_param('si', $naam, $lidnummer);
-    $stmt_naam->execute(); 
-    
-    if($stmt_naam->affected_rows != 1)
-    {
-        echo '<script> alert("Naam niet aangepast. Controleer of deze hetzelfde is of probeer het opnieuw.") </script>';
-        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
-    } 
-    else
-    {
-        header("location: ../lid.php?lidnummer=$lidnummer");
-    }
-    
-    $stmt_naam->close();    
-}
+    $num_telnrs = get_post($conn, 'num-telnrs');
+    $num_emails = get_post($conn, 'num-emails');
 
-if(isset($_POST['voornaam']))
-{
-    $lidnummer = get_post($conn, 'lidnummer');
-    $voornaam = get_post($conn, 'voornaam');
-    
-    $stmt_voornaam = $conn->prepare('UPDATE leden SET voornaam=? WHERE lidnummer=?');
-    $stmt_voornaam->bind_param('si', $voornaam, $lidnummer);
-    $stmt_voornaam->execute(); 
-    
-    if($stmt_voornaam->affected_rows != 1)
-    {
-        echo '<script> alert("Voornaam niet aangepast. Controleer of deze hetzelfde is of probeer het opnieuw.") </script>';
-        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
-    } 
-    else
-    {
-        header("location: ../lid.php?lidnummer=$lidnummer");
-    }
-    
-    $stmt_voornaam->close();    
-}
+    echo '<pre>';
+    print_r($_POST);
+    echo '</pre>';
 
-if(isset($_POST['huisnummer']))
-{
-    $lidnummer = get_post($conn, 'lidnummer');
-    $huisnummer = get_post($conn, 'huisnummer');
-    
-    $stmt_huisnummer = $conn->prepare('UPDATE leden SET huisnummer=? WHERE lidnummer=?');
-    $stmt_huisnummer->bind_param('si', $huisnummer, $lidnummer);
-    $stmt_huisnummer->execute(); 
-    
-    if($stmt_huisnummer->affected_rows != 1)
-    {
-        echo '<script> alert("Huisnummer niet aangepast. Controleer of deze hetzelfde is of probeer het opnieuw.") </script>';
-        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
-    } 
-    else
-    {
-        header("location: ../lid.php?lidnummer=$lidnummer");
+    $num_data_affected = 0;
+    foreach($_POST as $data => $info)
+    {        
+        $info = get_post($conn, $data);
+
+        if($data == 'naam' || $data == 'voornaam' || $data == 'huisnummer' || $data == 'postcode')
+        {
+            $stmt_data = $conn->prepare("UPDATE leden SET " . $data . "=? WHERE lidnummer=?");
+            $stmt_data->bind_param('si', $info, $lidnummer);
+            $stmt_data->execute();
+
+            $affected_info = $stmt_data->affected_rows;
+            $stmt_data->close();
+        }    
+        $num_data_affected += $affected_info;      
     }
     
-    $stmt_huisnummer->close();    
+    for($t = 0; $t < $num_telnrs; ++$t)
+    {
+        $telnr_num = $t + 1;
+        $telnr_new = get_post($conn, 'telefoonnummer' . $telnr_num);
+        $telnr_old = get_post($conn, 'oud-telnr' . $telnr_num);
+
+        if($telnr_new != $telnr_old)
+        {                  
+            $stmt_del_tel = $conn->prepare("DELETE FROM telefoonnummers WHERE telefoonnummer=?");
+            $stmt_del_tel->bind_param('s', $telnr_old);
+            $stmt_del_tel->execute();
+            
+            $stmt_ins_tel = $conn->prepare("INSERT INTO telefoonnummers VALUES (?, ?)");
+            $stmt_ins_tel->bind_param('si', $telnr_new, $lidnummer);
+            $stmt_ins_tel->execute();
+
+            $affected_tel = $stmt_ins_tel->affected_rows;
+
+            $stmt_del_tel->close();
+            $stmt_ins_tel->close();
+        }
+    }
+    $num_data_affected += $affected_tel;
+
+    for($t = 0; $t < $num_emails; ++$t)
+    {
+        $email_num = $t + 1;
+        $email_new = get_post($conn, 'email' . $email_num);
+        $email_old = get_post($conn, 'oud-email' . $email_num);
+
+        if($email_new != $email_old)
+        {                  
+            $stmt_del_email = $conn->prepare("DELETE FROM emails WHERE email=?");
+            $stmt_del_email->bind_param('s', $email_old);
+            $stmt_del_email->execute();
+            
+            $stmt_ins_email = $conn->prepare("INSERT INTO emails VALUES (?, ?)");
+            $stmt_ins_email->bind_param('si', $email_new, $lidnummer);
+            $stmt_ins_email->execute();
+
+            $affected_email = $stmt_ins_email->affected_rows;
+
+            $stmt_del_email->close();
+            $stmt_ins_email->close();
+        }
+    }
+    $num_data_affected += $affected_email;
+
+    if($num_data_affected < 1)
+    {
+        echo '<script> alert("Het lijkt erop dat niets gewijzigd is. Controleer alle gegevens. Ook of de postcode die u eventueel wilt toevoegen al bestaat. \n\nU wordt terug geleidt naar de vorige pagina. Probeer het opnieuw.") </script>';
+        echo '<script> window.history.go(-1) </script>'; 
+    }
+    else
+    {
+        echo '<script> alert("Gegevens aangepast. U kunt verder gaan met wijzigen of naar een andere pagina gaan.") </script>';
+        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';  
+    }
 }
 
 if(isset($_POST['postcode']) && isset($_POST['adres']) && isset($_POST['woonplaats']))
@@ -79,7 +100,7 @@ if(isset($_POST['postcode']) && isset($_POST['adres']) && isset($_POST['woonplaa
 
     if($stmt_postcode->affected_rows != 1)
     {
-        echo '<script> alert("Postcode niet aangepast. Controleer de gegevens en probeer het opnieuw") </script>';
+        echo '<script> alert("Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. \n\nU wordt terug geleidt naar de vorige pagina. Controleer de gegevens en probeer het opnieuw.") </script>';
         echo '<script> window.history.go(-1) </script>';         
     } 
     else
@@ -88,27 +109,6 @@ if(isset($_POST['postcode']) && isset($_POST['adres']) && isset($_POST['woonplaa
     }
     
     $stmt_postcode->close();  
-}
-elseif(isset($_POST['postcode']))
-{
-    $lidnummer = get_post($conn, 'lidnummer');
-    $postcode = get_post($conn, 'postcode');
-    
-    $stmt_postcode = $conn->prepare('UPDATE leden SET postcode=? WHERE lidnummer=?');
-    $stmt_postcode->bind_param('si', $postcode, $lidnummer);
-    $stmt_postcode->execute(); 
-    
-    if($stmt_postcode->affected_rows != 1)
-    {
-        echo '<script> alert("Postcode niet aangepast. Controleer of deze voldoet aan format 1234AB , of de postcode al is toegevoegd, of probeer het opnieuw") </script>';
-        echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
-    } 
-    else
-    {
-        header("location: ../lid.php?lidnummer=$lidnummer");
-    }
-    
-    $stmt_postcode->close();    
 }
 
 function get_post($conn, $var)

@@ -33,8 +33,59 @@
 <div>
     <h3>Postcodes:</h3>
     <?php 
-    include 'includes/read.php';
-    show_postcode_table($conn); 
+    require_once 'includes/connection.php';
+
+    $postcodes_query = "SELECT * FROM postcodes
+                            ORDER BY postcode";
+
+    $result = $conn->query($postcodes_query);
+    if(!$result) die ("<span style='color:red'>" . "Kon geen postcodes ophalen van de database. Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw". "</span>");
+    $rows = $result->num_rows;
+
+    if($rows < 1) { echo '<h3>Er staan nog geen postcodes in de database. Voeg eerst een postcode toe.</h3>'; }
+    else 
+    {
+        echo '<table>';
+        echo '<tbody>';
+        echo '<tr>';
+        echo '<th>Postcode    </th>';
+        echo '<th>Straat      </th>';
+        echo '<th>Woonplaats  </th>';
+        echo '<th>Update      </th>';
+        echo '<th>Delete      </th>';
+        echo '</tr>';
+
+        for($j = 0 ; $j < $rows ; ++$j) 
+        { 
+            $row = $result->fetch_array(MYSQLI_ASSOC);
+
+            echo '<tr>';
+            if($row['postcode'] == $_GET['postcode'])
+            {
+                echo '<form action="includes/update.php" method="POST">';
+                echo '<td>' . htmlspecialchars($row["postcode"])    . '</td>';
+                echo '<td><input type="text" name="adres" value="' . htmlspecialchars($row["adres"]) . '" required></td>';
+                echo '<td><input type="text" name="woonplaats" value="' . htmlspecialchars($row["woonplaats"]) . '" required></td>';
+                echo '<td><button type="subbmit">Save</td>';
+                echo '<td>----</td>';
+                echo '<input type="hidden" name="postcode" value="'. $row['postcode'] . '">';
+                echo '</form>';
+            }
+            else
+            {              
+                echo '<td>' . htmlspecialchars($row["postcode"])    . '</td>';
+                echo '<td>' . htmlspecialchars($row["adres"])       . '</td>';
+                echo '<td>' . htmlspecialchars($row["woonplaats"])  . '</td>';
+                echo '<td><a href="postcodes.php?postcode=' . $row['postcode'] . '">Update</a></td>';
+                echo '<td><a href="includes/delete.php?postcode=' . $row["postcode"] . '">Delete</a></td>';
+                
+            }
+            echo '</tr>';
+        }
+
+        echo '</tbody>';
+        echo '</table>';
+    }
     ?>
 </div>
 

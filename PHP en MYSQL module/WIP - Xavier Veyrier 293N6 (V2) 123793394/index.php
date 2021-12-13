@@ -26,7 +26,7 @@ else {
 <div class="leden-form">     
     <h3>Voeg nieuw lid toe:</h3>
    
-    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST"><b>
+    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
         <label for="naam">
             Voornaam:
             <input type="text" name="voornaam" required>
@@ -75,7 +75,7 @@ else {
         <label for="telnr">
             Telefoonummer(s):
             <input type="text" name="telnr" placeholder="0611457894, +318826549524" multiple>
-        </label></b>
+        </label>
         <button type="submit" name='add_member'>Voeg lid toe</button>
     </form><br>
 </div>

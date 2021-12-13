@@ -23,7 +23,7 @@ if(isset($_GET['lidnummer']))
 ?>
 <div class="contact-form">     
     <h3>Voeg contactgegevens toe:</h3>
-    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST"><b>
+    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
         <label for="telefoonnummer">
             Telefoonnummer:
             <input type="text" name="telefoonnummer" maxlength="13" required>
@@ -37,7 +37,7 @@ if(isset($_GET['lidnummer']))
             <input type="email" name="email" required>
         </label>
         <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
-        <button type="submit" name='add_email'>Voeg email toe</button></b>
+        <button type="submit" name='add_email'>Voeg email toe</button>
     </form><br>
     <?php
     if(isset($_POST['add_telnr']))
@@ -52,7 +52,8 @@ if(isset($_GET['lidnummer']))
         if($stmt_telnr->affected_rows != 1)
         { 
             echo '<script> alert("Telefoonnummer niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
-            echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
+            // echo '<script> window.location.href = "lid.php?lidnummer=' . $lidnummer . '" </script>';
+            echo '<script> window.history.go(-1) </script>';         
         } 
         else
         {
@@ -75,7 +76,8 @@ if(isset($_GET['lidnummer']))
         if($stmt_email->affected_rows != 1)
         { 
             echo '<script> alert("Emailadres niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
-            echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
+            // echo '<script> window.location.href = "lid.php?lidnummer=' . $lidnummer . '" </script>'; 
+            echo '<script> window.history.go(-1) </script>';         
         } 
         else
         {

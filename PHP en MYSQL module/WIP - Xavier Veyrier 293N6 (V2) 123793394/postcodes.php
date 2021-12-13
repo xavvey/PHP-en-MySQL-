@@ -14,7 +14,7 @@
 <div class='postcode-form'>
     <h3>Voeg nieuwe postcode toe</h3>
 
-    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST"><b>
+    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
         <label for="postcode">
             Postcode:
             <input type="text" name="postcode" pattern='^[1-9][0-9]{3}?[A-Z]{2}' placeholder="1234AB" required>
@@ -26,7 +26,7 @@
         <label for="woonplaats">
             Woonplaats:
             <input type="text" name="woonplaats" placeholder = "Alkmaar" required>
-        </label></b><button type="submit" name='add_postcode'>Voeg postcode toe</button>
+        </label><button type="submit" name='add_postcode'>Voeg postcode toe</button>
     </form><br>
     <?php
     require_once 'includes/connection.php';

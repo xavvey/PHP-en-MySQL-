@@ -12,8 +12,8 @@ require_once 'includes/connection.php';
 
 $show_tables_query = "SHOW TABLES FROM vereniging";
 $show_tables_result = $conn->query($show_tables_query);
-// if(!$show_tables_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
-// Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+if(!$show_tables_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
 
 $num_tables = $show_tables_result->num_rows;
 
@@ -86,7 +86,9 @@ else {
 
     <table>
         <tbody>
-            <?php     
+            <?php  
+            include 'includes/helpers.php';
+            
             $select_query = "SELECT * FROM leden  
                                 NATURAL JOIN postcodes
                                 ORDER BY lidnummer";
@@ -143,50 +145,6 @@ else {
         </tbody>
     </table>
 </div>
-<?php } 
-
-function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $usage)
-{
-    $subquery = "SELECT * FROM $db_table WHERE lidnummer='$init_row[lidnummer]'";
-    $subresult = $connection->query($subquery);
-    if(!$subresult) die ("<span style='color:red'>" . "Er ging iets mis met het ophalen van de contactgegevens. Probeert u het nog een keer." . "</span>");
-
-    $subrows = $subresult->num_rows;
-
-    $num = 1;
-    for($c = 0; $c < $subrows; ++$c)
-    {
-        $subrow = $subresult->fetch_array(MYSQLI_ASSOC);
-
-        if($usage == 'leden_table')
-        {            
-            echo htmlspecialchars($subrow[$db_column]) . "<br>";
-        }
-        elseif($usage == 'lid_table')
-        {   
-            echo '<tr>';    
-            if($db_table == 'telefoonnummers')
-            { 
-                echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>';
-                echo '<input type="hidden" name="num-telnrs" value="' . $num . '">';  
-                echo '<td><input type="text" name="telefoonnummer' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" maxlength="13" required></td>';
-                echo '<input type="hidden" name="oud-telnr' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '">'; 
-                echo '<td><a href="includes/delete.php?telefoonnummer=' . rawurlencode($subrow["telefoonnummer"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>';                
-            }
-            elseif($db_table == 'emails') 
-            { 
-                echo '<td><b> Email' . " ". $num  . '</td></b>';
-                echo '<input type="hidden" name="num-emails" value="' . $num . '">';  
-                echo '<td><input type="email" name="email' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" required></td>';
-                echo '<input type="hidden" name="oud-email' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '">'; 
-                echo '<td><a href="includes/delete.php?email=' . rawurlencode($subrow["email"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
-            }
-            echo '</tr>';
-        }
-        $num += 1;
-    } 
-}
-
-?>
+<?php } ?>
 </body>
 </html>

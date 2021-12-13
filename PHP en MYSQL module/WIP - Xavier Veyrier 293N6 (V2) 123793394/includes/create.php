@@ -107,7 +107,6 @@ function insert_contact_details($conn, $input, $db_table)
             $stmt->execute();
         }
         $stmt->close();
-        $conn->close();
     }
 }
 

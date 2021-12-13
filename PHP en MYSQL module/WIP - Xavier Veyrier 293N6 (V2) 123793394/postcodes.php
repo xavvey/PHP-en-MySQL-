@@ -88,11 +88,11 @@
             echo '<tr>';
             if($row['postcode'] == $_GET['postcode'])
             {
-                echo '<form action="includes/update.php" method="POST">';
+                echo '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
                 echo '<td>' . htmlspecialchars($row["postcode"])    . '</td>';
                 echo '<td><input type="text" name="adres" value="' . htmlspecialchars($row["adres"]) . '" required></td>';
                 echo '<td><input type="text" name="woonplaats" value="' . htmlspecialchars($row["woonplaats"]) . '" required></td>';
-                echo '<td><button type="subbmit">Save</td>';
+                echo '<td><button type="submit" name="update_postcode">Save</button></td>';
                 echo '<td>----</td>';
                 echo '<input type="hidden" name="postcode" value="'. $row['postcode'] . '">';
                 echo '</form>';
@@ -114,6 +114,30 @@
     }
 
     $result->close();
+
+    if(isset($_POST['update_postcode']))
+    {
+        $postcode = get_post($conn, 'postcode');
+        $adres = get_post($conn, 'adres');
+        $woonplaats = get_post($conn, 'woonplaats');
+
+        $stmt_postcode = $conn->prepare('UPDATE postcodes SET adres=?, woonplaats=? WHERE postcode=?');
+        $stmt_postcode->bind_param('sss', $adres, $woonplaats, $postcode);
+        $stmt_postcode->execute();
+
+        if($stmt_postcode->affected_rows != 1)
+        {
+            echo '<script> alert("Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. \n\nU wordt terug geleidt naar de pagina. Controleer de gegevens en probeer het opnieuw.") </script>';
+            echo '<script> window.history.go(-1) </script>';         
+        } 
+        else
+        {
+            header("location: postcodes.php");
+        }
+        
+        $stmt_postcode->close();  
+    }
+
     $conn->close();
     ?>
 </div>

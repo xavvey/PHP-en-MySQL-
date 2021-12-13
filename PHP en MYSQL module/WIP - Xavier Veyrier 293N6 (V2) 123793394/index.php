@@ -14,7 +14,7 @@ $show_tables_query = "SHOW TABLES FROM vereniging";
 $show_tables_result = $conn->query($show_tables_query);
 
 $num_tables = $show_tables_result->num_rows;
-if($num_tables == 0) {echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; }
+if($num_tables == 0) {echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; } // Bij geen tabellen wordt dit getoond.
 else {
 ?>
 
@@ -96,7 +96,7 @@ else {
 
             $num_members = $select_result->num_rows;
 
-            if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h2>";
+            if($num_members == 0) { echo "<h2>Er zijn geen leden gevonden in de database.</h2>"; //Bij bestaande tabellen die leeg zijn, wordt dit getoond. Optie om leden toe te voegen bestaat dan wel.
             } else {
                 echo '<tr>';
                 echo '<th>Lidnummer</th>';

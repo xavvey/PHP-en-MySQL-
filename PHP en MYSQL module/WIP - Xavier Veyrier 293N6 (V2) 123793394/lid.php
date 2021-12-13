@@ -14,7 +14,10 @@
 
 <?php
 require_once 'includes/connection.php';
-include 'includes/helpers.php';
+require_once 'includes/helpers.php';
+
+ob_start(); // Snap niet precies wat dit doet maar zonder dit dan werkt de delete knop niet -> 'Cannot modify header information' error komt dan tevoorschijn
+//oorzaak error gevonden, maar weet fix niet (ligt aan header() op regels 237 & 248)
 
 if(isset($_GET['lidnummer'])) 
 { 
@@ -44,15 +47,12 @@ if(isset($_GET['lidnummer']))
     {
         $telnr = get_post($conn, 'telefoonnummer');
         $lidnummer = get_post($conn, 'lidnummer');
+
+        insert_row($conn, 'telefoonnummers', $telnr, $lidnummer);
     
-        $stmt_telnr = $conn->prepare("INSERT INTO telefoonnummers VALUES(?,?)");
-        $stmt_telnr->bind_param('si', $telnr, $lidnummer);
-        $stmt_telnr->execute();
-    
-        if($stmt_telnr->affected_rows != 1)
+        if($affected_rows != 1)
         { 
             echo '<script> alert("Telefoonnummer niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
-            // echo '<script> window.location.href = "lid.php?lidnummer=' . $lidnummer . '" </script>';
             echo '<script> window.history.go(-1) </script>';         
         } 
         else
@@ -69,14 +69,11 @@ if(isset($_GET['lidnummer']))
         $email = get_post($conn, 'email');
         $lidnummer = get_post($conn, 'lidnummer');
     
-        $stmt_email = $conn->prepare("INSERT INTO emails VALUES(?,?)");
-        $stmt_email->bind_param('si', $email, $lidnummer);
-        $stmt_email->execute();
+        insert_row($conn, 'emails', $email, $lidnummer);
     
-        if($stmt_email->affected_rows != 1)
+        if($affected_rows != 1)
         { 
             echo '<script> alert("Emailadres niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
-            // echo '<script> window.location.href = "lid.php?lidnummer=' . $lidnummer . '" </script>'; 
             echo '<script> window.history.go(-1) </script>';         
         } 
         else
@@ -113,31 +110,31 @@ if(isset($_GET['lidnummer']))
 
                 foreach($gegevens_lid as $data => $info)
                 {
-                echo '<tr>';
-                echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
+                    echo '<tr>';
+                    echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
 
-                if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
-                {
-                    echo '<td>' . htmlspecialchars($info) . '</td>';
-                    echo '<td> ---- </td>';
-                    
-                } 
-                elseif($data == 'postcode')
-                {
-                    echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
-                    echo '<td> ---- </td>';
-                }
-                else
-                {
-                    echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
-                    echo '<td> ---- </td>';
-                }            
-                echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">'; 
-                echo '</tr>';
+                    if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
+                    {
+                        echo '<td>' . htmlspecialchars($info) . '</td>';
+                        echo '<td> ---- </td>';
+                        
+                    } 
+                    elseif($data == 'postcode')
+                    {
+                        echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
+                        echo '<td> ---- </td>';
+                    }
+                    else
+                    {
+                        echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
+                        echo '<td> ---- </td>';
+                    }            
+                    echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">'; 
+                    echo '</tr>';
                 }
 
-                toon_contactgegevens('telefoonnummers', $gegevens_lid, $conn, 'telefoonnummer', 'lid_table');
-                toon_contactgegevens('emails', $gegevens_lid, $conn, 'email', 'lid_table');
+                show_member_contacts('telefoonnummers', $gegevens_lid, $conn, 'telefoonnummer', 'lid_table');
+                show_member_contacts('emails', $gegevens_lid, $conn, 'email', 'lid_table');
 
                 $select_lid_result->close();
                               
@@ -177,22 +174,12 @@ if(isset($_GET['lidnummer']))
             $telnr_old = get_post($conn, 'oud-telnr' . $telnr_num);
     
             if($telnr_new != $telnr_old)
-            {                  
-                $stmt_del_tel = $conn->prepare("DELETE FROM telefoonnummers WHERE telefoonnummer=?");
-                $stmt_del_tel->bind_param('s', $telnr_old);
-                $stmt_del_tel->execute();
-                
-                $stmt_ins_tel = $conn->prepare("INSERT INTO telefoonnummers VALUES (?, ?)");
-                $stmt_ins_tel->bind_param('si', $telnr_new, $lidnummer);
-                $stmt_ins_tel->execute();
-    
-                $affected_tel = $stmt_ins_tel->affected_rows;
-    
-                $stmt_del_tel->close();
-                $stmt_ins_tel->close();
+            {    
+                delete_row($conn, 'telefoonnummers', 'telefoonnummer', $telnr_old);                             
+                insert_row($conn, 'telefoonnummers', $telnr_new, $lidnummer);
             }
         }
-        $num_data_affected += $affected_tel;
+        $num_data_affected += $affected_rows;
     
         for($t = 0; $t < $num_emails; ++$t)
         {
@@ -201,22 +188,12 @@ if(isset($_GET['lidnummer']))
             $email_old = get_post($conn, 'oud-email' . $email_num);
     
             if($email_new != $email_old)
-            {                  
-                $stmt_del_email = $conn->prepare("DELETE FROM emails WHERE email=?");
-                $stmt_del_email->bind_param('s', $email_old);
-                $stmt_del_email->execute();
-                
-                $stmt_ins_email = $conn->prepare("INSERT INTO emails VALUES (?, ?)");
-                $stmt_ins_email->bind_param('si', $email_new, $lidnummer);
-                $stmt_ins_email->execute();
-    
-                $affected_email = $stmt_ins_email->affected_rows;
-    
-                $stmt_del_email->close();
-                $stmt_ins_email->close();
+            {           
+                delete_row($conn, 'emails', 'email', $email_old);       
+                insert_row($conn, 'emails', $email_new, $lidnummer);
             }
         }
-        $num_data_affected += $affected_email;
+        $num_data_affected += $affected_rows;
     
         if($num_data_affected < 1)
         {
@@ -230,7 +207,27 @@ if(isset($_GET['lidnummer']))
         }
     }
 
-    $conn->close();  
+    if(isset($_GET['telefoonnummer']) && isset($_GET['lidnummer']))
+    {   
+        $telefoonnummer = $_GET['telefoonnummer'];
+        $lidnummer = $_GET['lidnummer'];
+
+        delete_row($conn, 'telefoonnummers', 'telefoonnummer', $telefoonnummer);
+
+        header("location: lid.php?lidnummer=$lidnummer"); //geeft header error zonder ob_start()
+    } 
+    elseif(isset($_GET['email']) && isset($_GET['lidnummer']))
+    {
+        $email = $_GET['email'];
+        $lidnummer = $_GET['lidnummer'];
+
+        delete_row($conn, 'emails', 'email', $email);
+
+        header("location: lid.php?lidnummer=$lidnummer"); //geeft header error zonder ob_start()
+    }
+
+    $conn->close(); 
+    ob_end_flush();
     ?>
 </div>
 

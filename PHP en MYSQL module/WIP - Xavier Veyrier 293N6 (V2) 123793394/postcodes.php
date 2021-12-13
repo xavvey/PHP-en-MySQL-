@@ -30,7 +30,7 @@
     </form><br>
     <?php
     require_once 'includes/connection.php';
-    include 'includes/helpers.php';
+    require_once 'includes/helpers.php';
 
     if(isset($_POST["add_postcode"]))
     {
@@ -103,7 +103,7 @@
                 echo '<td>' . htmlspecialchars($row["adres"])       . '</td>';
                 echo '<td>' . htmlspecialchars($row["woonplaats"])  . '</td>';
                 echo '<td><a href="postcodes.php?postcode=' . $row['postcode'] . '">Update</a></td>';
-                echo '<td><a href="includes/delete.php?postcode=' . $row["postcode"] . '">Delete</a></td>';
+                echo '<td><a href="postcodes.php?postcode=' . $row["postcode"] . '&adres=' . $row["adres"] . '">Delete</a></td>';
                 
             }
             echo '</tr>';
@@ -136,6 +136,15 @@
         }
         
         $stmt_postcode->close();  
+    }
+
+    if(isset($_GET['postcode']) && isset($_GET['adres']))
+    {
+        $postcode = $_GET['postcode'];
+
+        delete_row($conn, 'postcodes', 'postcode', $postcode);
+
+        header("location: postcodes.php");
     }
 
     $conn->close();

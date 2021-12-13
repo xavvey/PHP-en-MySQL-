@@ -8,7 +8,7 @@
 
 <?php 
 require_once 'includes/connection.php';
-include 'includes/helpers.php';
+require_once 'includes/helpers.php';
 
 $show_tables_query = "SHOW TABLES FROM vereniging";
 $show_tables_result = $conn->query($show_tables_query);
@@ -125,13 +125,13 @@ else {
                 echo '<td>' . htmlspecialchars($row["postcode"])    . '</td>';
                 echo '<td>' . htmlspecialchars($row["woonplaats"])  . '</td>';
                 echo '<td>';
-                toon_contactgegevens('emails', $row, $conn, 'email', 'leden_table');
+                show_member_contacts('emails', $row, $conn, 'email', 'leden_table');
                 echo '</td>';
                 echo '<td>'; 
-                toon_contactgegevens('telefoonnummers', $row, $conn, 'telefoonnummer', 'leden_table');
+                show_member_contacts('telefoonnummers', $row, $conn, 'telefoonnummer', 'leden_table');
                 echo '</td>';  
                 echo '<td><a href="lid.php?lidnummer=' . $row["lidnummer"] . '">Update lid</a></td>';
-                echo '<td><a href="includes/delete.php?lidnummer=' . $row["lidnummer"] . '">Delete</a></td>';                           
+                echo '<td><a href="index.php?lidnummer=' . $row["lidnummer"] . '">Delete</a></td>';                           
                 echo "</tr>";
                 }
             }
@@ -161,9 +161,21 @@ if(isset($_POST["add_member"]))
 
     header("location: index.php");
 
-    $stmt_lid->close();
-    $conn->close();
+    $stmt_lid->close(); 
 }
+
+if(isset($_GET['lidnummer']))
+{
+    $lidnummer = $_GET["lidnummer"];
+
+    delete_row($conn, 'telefoonnummers', 'lidnummer', $lidnummer);
+    delete_row($conn, 'emails', 'lidnummer', $lidnummer);
+    delete_row($conn, 'leden', 'lidnummer', $lidnummer);
+
+    header("location: index.php");
+}
+
+$conn->close();
 ?>
 </body>
 </html>

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '../connection.php';
+
 function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $usage)
 {
     $subquery = "SELECT * FROM $db_table WHERE lidnummer='$init_row[lidnummer]'";
@@ -39,5 +41,27 @@ function toon_contactgegevens($db_table, $init_row, $connection, $db_column, $us
         }
         $num += 1;
     } 
+}
+
+function insert_contact_details($conn, $input, $db_table)
+{
+    if($input != "")
+    {
+        $stmt = $conn->prepare('INSERT INTO ' . $db_table . ' VALUES (?, LAST_INSERT_ID())');
+
+        $contacts_arr = explode(",", $input);  
+
+        foreach($contacts_arr as $contact)
+        {      
+            $stmt->bind_param('s', $contact,);
+            $stmt->execute();
+        }
+        $stmt->close();
+    }
+}
+
+function get_post($conn, $var)
+{
+    return $conn->real_escape_string($_POST[$var]);
 }
 ?>

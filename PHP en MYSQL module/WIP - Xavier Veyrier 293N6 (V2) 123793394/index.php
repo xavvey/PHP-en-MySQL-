@@ -7,13 +7,11 @@
 <body>
 
 <?php 
-// include 'includes/read.php';
 require_once 'includes/connection.php';
+include 'includes/helpers.php';
 
 $show_tables_query = "SHOW TABLES FROM vereniging";
 $show_tables_result = $conn->query($show_tables_query);
-if(!$show_tables_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
-Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
 
 $num_tables = $show_tables_result->num_rows;
 
@@ -29,7 +27,7 @@ else {
 <div class="leden-form">     
     <h3>Voeg nieuw lid toe:</h3>
    
-    <form action="includes/create.php" method="POST"><b>
+    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST"><b>
         <label for="naam">
             Voornaam:
             <input type="text" name="voornaam" required>
@@ -66,6 +64,8 @@ else {
 
                     echo "<option value='$postcode'>" . $postcode . " - " . $straat . " - " . $woonplaats . "</option>"; 
                 } 
+
+                $postcode_result->close();
                 ?>
             </select>
         </label>
@@ -86,9 +86,7 @@ else {
 
     <table>
         <tbody>
-            <?php  
-            include 'includes/helpers.php';
-            
+            <?php 
             $select_query = "SELECT * FROM leden  
                                 NATURAL JOIN postcodes
                                 ORDER BY lidnummer";
@@ -140,11 +138,33 @@ else {
             }
 
             $select_result->close();
-            $conn->close(); 
             ?>
         </tbody>
     </table>
 </div>
-<?php } ?>
+<?php } 
+
+if(isset($_POST["add_member"])) 
+{   
+    $voornaam = get_post($conn, 'voornaam');
+    $achternaam = get_post($conn, 'achternaam');
+    $huisnummer = get_post($conn, 'huisnummer');
+    $postcode = get_post($conn, 'postcode');
+    $telnrs = get_post($conn, 'telnr');
+    $emails = get_post($conn, 'emailadres');
+
+    $stmt_lid = $conn->prepare('INSERT INTO leden (naam, voornaam, huisnummer, postcode) VALUES(?, ?, ?, ?)');
+    $stmt_lid->bind_param('ssss', $achternaam, $voornaam, $huisnummer, $postcode);
+    $stmt_lid->execute();  
+
+    insert_contact_details($conn, $telnrs, 'telefoonnummers');
+    insert_contact_details($conn, $emails, 'emails');
+
+    header("location: index.php");
+
+    $stmt_lid->close();
+    $conn->close();
+}
+?>
 </body>
 </html>

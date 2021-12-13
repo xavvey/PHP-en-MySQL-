@@ -14,7 +14,7 @@
 <div class='postcode-form'>
     <h3>Voeg nieuwe postcode toe</h3>
 
-    <form action="includes/create.php" method="POST"><b>
+    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST"><b>
         <label for="postcode">
             Postcode:
             <input type="text" name="postcode" pattern='^[1-9][0-9]{3}?[A-Z]{2}' placeholder="1234AB" required>
@@ -28,13 +28,39 @@
             <input type="text" name="woonplaats" placeholder = "Alkmaar" required>
         </label></b><button type="submit" name='add_postcode'>Voeg postcode toe</button>
     </form><br>
+    <?php
+    require_once 'includes/connection.php';
+    include 'includes/helpers.php';
+
+    if(isset($_POST["add_postcode"]))
+    {
+        $postcode   = get_post($conn, "postcode");
+        $adres      = get_post($conn, "straat");
+        $woonplaats = get_post($conn, "woonplaats");
+    
+        $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
+        $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
+        $stmt->execute();
+    
+        if($stmt->affected_rows != 1)
+        { 
+            echo '<script> alert("Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en probeer het opnieuw.") </script>';
+            echo '<script> window.history.go(-1) </script>';          
+        } 
+        else
+        {
+            header("location: postcodes.php");
+        }
+    
+        $stmt->close();
+        $conn->close();    
+    } 
+    ?>
 </div>
 
 <div>
     <h3>Postcodes:</h3>
     <?php 
-    require_once 'includes/connection.php';
-
     $postcodes_query = "SELECT * FROM postcodes
                             ORDER BY postcode";
 
@@ -86,6 +112,9 @@
         echo '</tbody>';
         echo '</table>';
     }
+
+    $result->close();
+    $conn->close();
     ?>
 </div>
 

@@ -14,6 +14,7 @@
 
 <?php
 require_once 'includes/connection.php';
+include 'includes/helpers.php';
 
 if(isset($_GET['lidnummer'])) 
 { 
@@ -22,7 +23,7 @@ if(isset($_GET['lidnummer']))
 ?>
 <div class="contact-form">     
     <h3>Voeg contactgegevens toe:</h3>
-    <form action="includes/create.php" method="POST"><b>
+    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST"><b>
         <label for="telefoonnummer">
             Telefoonnummer:
             <input type="text" name="telefoonnummer" maxlength="13" required>
@@ -30,7 +31,7 @@ if(isset($_GET['lidnummer']))
         <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
         <button type="submit" name='add_telnr'>Voeg telnr toe</button>
     </form><br>
-    <form action="includes/create.php" method="POST">        
+    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">        
         <label for="email">
             Email:
             <input type="email" name="email" required>
@@ -38,6 +39,53 @@ if(isset($_GET['lidnummer']))
         <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
         <button type="submit" name='add_email'>Voeg email toe</button></b>
     </form><br>
+    <?php
+    if(isset($_POST['add_telnr']))
+    {
+        $telnr = get_post($conn, 'telefoonnummer');
+        $lidnummer = get_post($conn, 'lidnummer');
+    
+        $stmt_telnr = $conn->prepare("INSERT INTO telefoonnummers VALUES(?,?)");
+        $stmt_telnr->bind_param('si', $telnr, $lidnummer);
+        $stmt_telnr->execute();
+    
+        if($stmt_telnr->affected_rows != 1)
+        { 
+            echo '<script> alert("Telefoonnummer niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
+            echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
+        } 
+        else
+        {
+            header("location: lid.php?lidnummer=$lidnummer");
+        }
+    
+        $stmt_telnr->close();
+        $conn->close();
+    }
+    
+    if(isset($_POST['add_email']))
+    {
+        $email = get_post($conn, 'email');
+        $lidnummer = get_post($conn, 'lidnummer');
+    
+        $stmt_email = $conn->prepare("INSERT INTO emails VALUES(?,?)");
+        $stmt_email->bind_param('si', $email, $lidnummer);
+        $stmt_email->execute();
+    
+        if($stmt_email->affected_rows != 1)
+        { 
+            echo '<script> alert("Emailadres niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
+            echo '<script> window.location.href = "../lid.php?lidnummer=' . $lidnummer . '" </script>';         
+        } 
+        else
+        {
+            header("location: lid.php?lidnummer=$lidnummer");
+        }
+    
+        $stmt_email->close();
+        $conn->close();
+    }
+    ?>
 </div>
 
 <div>
@@ -51,8 +99,6 @@ if(isset($_GET['lidnummer']))
                     <th>Delete</th>
                 </tr>
                 <?php 
-                include 'includes/helpers.php';
-
                 $select_lid_query = "SELECT * FROM leden 
                                         INNER JOIN postcodes ON postcodes.postcode = leden.postcode
                                         WHERE lidnummer='$lidnummer'";

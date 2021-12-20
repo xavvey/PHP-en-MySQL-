@@ -7,16 +7,14 @@
 <body>
 
 <?php 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-
 require_once 'includes/connection.php';
 require_once 'includes/helper_functions.php';
 
-$show_tables_query = "SHOW TABLES FROM vereniging";
+$show_tables_query = "SHOW TABLES FROM $database";
 $show_tables_result = $conn->query($show_tables_query);
 
 $num_tables = $show_tables_result->num_rows;
+
 if($num_tables == 0) {echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; } // Bij geen tabellen wordt dit getoond.
 else {
 ?>

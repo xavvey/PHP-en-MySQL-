@@ -30,7 +30,7 @@
     </form><br>
     <?php
     require_once 'includes/connection.php';
-    require_once 'includes/helpers.php';
+    require_once 'includes/helper_functions.php';
 
     if(isset($_POST["add_postcode"]))
     {

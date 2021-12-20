@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '../connection.php';
 
-function show_member_contacts($db_table, $init_row, $connection, $db_column, $usage)
+function show_member_contacts($db_table, $init_row, $connection, $db_column, $usage) // 4x gebruikt
 {
     $subquery = "SELECT * FROM $db_table WHERE lidnummer='$init_row[lidnummer]'";
     $subresult = $connection->query($subquery);
@@ -45,7 +45,7 @@ function show_member_contacts($db_table, $init_row, $connection, $db_column, $us
     $subresult->close();
 }
 
-function insert_contact_details($conn, $input, $db_table)
+function insert_contact_details($conn, $input, $db_table) // 2x gebruikt
 {
     if($input != "")
     {
@@ -62,7 +62,7 @@ function insert_contact_details($conn, $input, $db_table)
     }
 }
 
-function insert_row($conn, $db_table, $new_data, $lidnummer)
+function insert_row($conn, $db_table, $new_data, $lidnummer) // 4x gebruikt
 {
     $stmt_ins_row = $conn->prepare("INSERT INTO $db_table VALUES(?,?)");
     $stmt_ins_row->bind_param('si', $new_data, $lidnummer);
@@ -74,7 +74,7 @@ function insert_row($conn, $db_table, $new_data, $lidnummer)
     $stmt_ins_row->close;
 }
 
-function delete_row($conn, $db_table, $db_column, $row_reference)
+function delete_row($conn, $db_table, $db_column, $row_reference) // 8x gebruikt
 {
     $stmt_del_row = $conn->prepare("DELETE FROM $db_table WHERE $db_column=?");
     $stmt_del_row->bind_param('s', $row_reference);
@@ -82,7 +82,7 @@ function delete_row($conn, $db_table, $db_column, $row_reference)
     $stmt_del_row->close();
 }
 
-function get_post($conn, $var)
+function get_post($conn, $var) //24x gebruikt
 {
     return $conn->real_escape_string($_POST[$var]);
 }

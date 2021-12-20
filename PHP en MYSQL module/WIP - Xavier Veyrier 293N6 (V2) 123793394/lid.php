@@ -14,7 +14,7 @@
 
 <?php
 require_once 'includes/connection.php';
-require_once 'includes/helpers.php';
+require_once 'includes/helper_functions.php';
 
 ob_start(); // Snap niet precies wat dit doet maar zonder dit dan werkt de delete knop niet -> 'Cannot modify header information' error komt dan tevoorschijn
 //oorzaak error gevonden, maar weet fix niet (ligt aan header() op regels 237 & 248)

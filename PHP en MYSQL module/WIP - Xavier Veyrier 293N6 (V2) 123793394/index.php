@@ -8,7 +8,7 @@
 
 <?php 
 require_once 'includes/connection.php';
-require_once 'includes/helpers.php';
+require_once 'includes/helper_functions.php';
 
 $show_tables_query = "SHOW TABLES FROM vereniging";
 $show_tables_result = $conn->query($show_tables_query);

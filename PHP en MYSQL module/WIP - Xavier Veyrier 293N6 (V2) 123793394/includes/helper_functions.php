@@ -68,10 +68,10 @@ function insert_row($conn, $db_table, $new_data, $lidnummer) // 4x gebruikt
     $stmt_ins_row->bind_param('si', $new_data, $lidnummer);
     $stmt_ins_row->execute();
 
-    global $affected_rows; //global om affected rows bij elkaar op te kunnen tellen voor lid.php -> check of iets is aangepast
-    $affected_rows = $stmt_ins_row->affected_rows;
-
+    $affected_row = $stmt_ins_row->affected_rows;
     $stmt_ins_row->close;
+
+    return $affected_row;
 }
 
 function delete_row($conn, $db_table, $db_column, $row_reference) // 8x gebruikt

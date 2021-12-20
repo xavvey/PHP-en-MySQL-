@@ -48,9 +48,9 @@ if(isset($_GET['lidnummer']))
         $telnr = get_post($conn, 'telefoonnummer');
         $lidnummer = get_post($conn, 'lidnummer');
 
-        insert_row($conn, 'telefoonnummers', $telnr, $lidnummer);
+        $num_inserts = insert_row($conn, 'telefoonnummers', $telnr, $lidnummer);
     
-        if($affected_rows != 1)
+        if($num_inserts != 1)
         { 
             echo '<script> alert("Telefoonnummer niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
             echo '<script> window.history.go(-1) </script>';         
@@ -69,9 +69,9 @@ if(isset($_GET['lidnummer']))
         $email = get_post($conn, 'email');
         $lidnummer = get_post($conn, 'lidnummer');
     
-        insert_row($conn, 'emails', $email, $lidnummer);
+        $num_inserts = insert_row($conn, 'emails', $email, $lidnummer);
     
-        if($affected_rows != 1)
+        if($num_inserts != 1)
         { 
             echo '<script> alert("Emailadres niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
             echo '<script> window.history.go(-1) </script>';         
@@ -176,10 +176,10 @@ if(isset($_GET['lidnummer']))
             if($telnr_new != $telnr_old)
             {    
                 delete_row($conn, 'telefoonnummers', 'telefoonnummer', $telnr_old);                             
-                insert_row($conn, 'telefoonnummers', $telnr_new, $lidnummer);
+                $affected_row = insert_row($conn, 'telefoonnummers', $telnr_new, $lidnummer);
             }
         }
-        $num_data_affected += $affected_rows;
+        $num_data_affected += $affected_row;
     
         for($t = 0; $t < $num_emails; ++$t)
         {
@@ -190,10 +190,10 @@ if(isset($_GET['lidnummer']))
             if($email_new != $email_old)
             {           
                 delete_row($conn, 'emails', 'email', $email_old);       
-                insert_row($conn, 'emails', $email_new, $lidnummer);
+                $affected_row = insert_row($conn, 'emails', $email_new, $lidnummer);
             }
         }
-        $num_data_affected += $affected_rows;
+        $num_data_affected += $affected_row;
     
         if($num_data_affected < 1)
         {

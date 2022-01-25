@@ -52,8 +52,7 @@ if(isset($_GET['lidnummer']))
     
         if($num_inserts != 1)
         { 
-            echo '<script> alert("Telefoonnummer niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
-            echo '<script> window.history.go(-1) </script>';         
+            echo "<span style='color:red'>" . "Telefoonnummer niet toegevoegd. Waarschijnlijk bestaat deze al. Ga terug, controleer de lijst en/of probeer het opnieuw." . "</span>";         
         } 
         else
         {
@@ -73,8 +72,7 @@ if(isset($_GET['lidnummer']))
     
         if($num_inserts != 1)
         { 
-            echo '<script> alert("Emailadres niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en/of probeer het opnieuw.") </script>';
-            echo '<script> window.history.go(-1) </script>';         
+            echo "<span style='color:red'>" . "Emailadres niet toegevoegd. Waarschijnlijk bestaat deze al. Ga terug, controleer de lijst en/of probeer het opnieuw." . "</span>";         
         } 
         else
         {
@@ -95,11 +93,11 @@ if(isset($_GET['lidnummer']))
                 <tr>
                     <th>#</th>
                     <th>Info</th>
-                    <th>Delete</th>
                 </tr>
                 <?php 
                 $select_lid_query = "SELECT * FROM leden 
                                         INNER JOIN postcodes ON postcodes.postcode = leden.postcode
+                                        NATURAL JOIN telefoonnummers
                                         WHERE lidnummer='$lidnummer'";
 
                 $select_lid_result = $conn->query($select_lid_query);
@@ -112,34 +110,36 @@ if(isset($_GET['lidnummer']))
                 {
                     echo '<tr>';
                     echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
-
-                    if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
-                    {
-                        echo '<td>' . htmlspecialchars($info) . '</td>';
-                        echo '<td> ---- </td>';
-                        
-                    } 
-                    elseif($data == 'postcode')
-                    {
-                        echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
-                        echo '<td> ---- </td>';
-                    }
-                    else
-                    {
-                        echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
-                        echo '<td> ---- </td>';
-                    }            
-                    echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">'; 
+                    echo '<td>' . htmlspecialchars($info) . '</td>';
                     echo '</tr>';
+
+                //     if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
+                //     {
+                //         echo '<td>' . htmlspecialchars($info) . '</td>';
+                //         echo '<td> ---- </td>';
+                        
+                //     } 
+                //     elseif($data == 'postcode')
+                //     {
+                //         echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
+                //         echo '<td> ---- </td>';
+                //     }
+                //     else
+                //     {
+                //         echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
+                //         echo '<td> ---- </td>';
+                //     }            
+                //     echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">'; 
+                //     echo '</tr>';
                 }
 
-                show_member_contacts('telefoonnummers', $gegevens_lid, $conn, 'telefoonnummer', 'lid_table');
-                show_member_contacts('emails', $gegevens_lid, $conn, 'email', 'lid_table');
+                // show_member_contacts('telefoonnummers', $gegevens_lid, $conn, 'telefoonnummer', 'lid_table');
+                // show_member_contacts('emails', $gegevens_lid, $conn, 'email', 'lid_table');
 
                 $select_lid_result->close();
                               
                 ?>
-                <td colspan="3" ><button type="submit" name="update_lid">Save</button></td>          
+                <td colspan="2" ><button type="submit" name="update_lid">Save</button></td>          
             </tbody>
         </table>
     </form>
@@ -197,13 +197,7 @@ if(isset($_GET['lidnummer']))
     
         if($num_data_affected < 1)
         {
-            echo '<script> alert("Het lijkt erop dat niets gewijzigd is. Controleer alle gegevens. Ook of de postcode die u eventueel wilt toevoegen al bestaat. \n\nU wordt terug geleidt naar de pagina. Probeer het opnieuw.") </script>';
-            echo '<script> window.history.go(-1) </script>'; 
-        }
-        else
-        {
-            echo '<script> alert("Gegevens aangepast. U kunt verder gaan met wijzigen of naar een andere pagina gaan.") </script>';
-            echo '<script> window.location.href = "lid.php?lidnummer=' . $lidnummer . '" </script>';  
+            echo "<span style='color:red'>" . "Het lijkt erop dat niets gewijzigd is. Ga terug, controleer de gegevens en of de postcode bestaat. Probeert u het opnieuw" . "</span>";  
         }
     }
 

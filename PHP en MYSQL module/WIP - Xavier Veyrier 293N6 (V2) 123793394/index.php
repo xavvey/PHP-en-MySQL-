@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Vereniging ledenlijst</title>
-  <link rel="stylesheet" type="text/css" href="includes/CSS/general_styling.css" />    
-</head>
-<body>
-
 <?php 
 require_once 'includes/connection.php';
 require_once 'includes/helper_functions.php';
@@ -14,7 +6,17 @@ $show_tables_query = "SHOW TABLES FROM $database";
 $show_tables_result = $conn->query($show_tables_query);
 
 $num_tables = $show_tables_result->num_rows;
+?>
 
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vereniging ledenlijst</title>
+        <link rel="stylesheet" type="text/css" href="includes/CSS/general_styling.css" />    
+    </head>
+<body>
+
+<?php
 if($num_tables == 0) {echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; } // Bij geen tabellen wordt dit getoond.
 else {
 ?>

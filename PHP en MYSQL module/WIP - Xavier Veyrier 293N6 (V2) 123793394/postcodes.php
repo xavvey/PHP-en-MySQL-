@@ -1,9 +1,37 @@
+<?php
+require_once 'includes/connection.php';
+require_once 'includes/helper_functions.php';
+
+if(isset($_POST["add_postcode"]))
+{
+    $postcode   = get_post($conn, "postcode");
+    $adres      = get_post($conn, "straat");
+    $woonplaats = get_post($conn, "woonplaats");
+
+    $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
+    $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
+    $stmt->execute();
+
+    if($stmt->affected_rows != 1)
+    { 
+        echo "<span style='color:red'>" . "Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Ga terug, controleer de lijst en probeer het opnieuw." . "</span>";       
+    } 
+    else
+    {
+        header("location: postcodes.php");
+    }
+
+    $stmt->close();
+    $conn->close();    
+} 
+?>
+
 <!DOCTYPE html>
 <html>
-<head>
-<title>Postcodes wijzigen</title>
-  <link rel="stylesheet" type="text/css" href="includes/CSS/general_styling.css" /> 
-</head>
+    <head>
+        <title>Postcodes wijzigen</title>
+        <link rel="stylesheet" type="text/css" href="includes/CSS/general_styling.css" /> 
+    </head>
 <body>
 
 <div>
@@ -28,34 +56,6 @@
             <input type="text" name="woonplaats" placeholder = "Alkmaar" required>
         </label><button type="submit" name='add_postcode'>Voeg postcode toe</button>
     </form><br>
-    <?php
-    require_once 'includes/connection.php';
-    require_once 'includes/helper_functions.php';
-
-    if(isset($_POST["add_postcode"]))
-    {
-        $postcode   = get_post($conn, "postcode");
-        $adres      = get_post($conn, "straat");
-        $woonplaats = get_post($conn, "woonplaats");
-    
-        $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
-        $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
-        $stmt->execute();
-    
-        if($stmt->affected_rows != 1)
-        { 
-            echo '<script> alert("Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Controleer de lijst en probeer het opnieuw.") </script>';
-            echo '<script> window.history.go(-1) </script>';          
-        } 
-        else
-        {
-            header("location: postcodes.php");
-        }
-    
-        $stmt->close();
-        $conn->close();    
-    } 
-    ?>
 </div>
 
 <div>
@@ -68,7 +68,7 @@
     if(!$result) die ("<span style='color:red'>" . "Kon geen postcodes ophalen van de database. Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw". "</span>");
     $rows = $result->num_rows;
 
-    if($rows < 1) { echo '<h3>Er staan nog geen postcodes in de database. Voeg eerst een postcode toe.</h3>'; }
+    if($rows == 0) { echo '<h3>Er staan nog geen postcodes in de database. Voeg eerst een postcode toe.</h3>'; }
     else 
     {
         echo '<table>';
@@ -127,8 +127,7 @@
 
         if($stmt_postcode->affected_rows != 1)
         {
-            echo '<script> alert("Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. \n\nU wordt terug geleidt naar de pagina. Controleer de gegevens en probeer het opnieuw.") </script>';
-            echo '<script> window.history.go(-1) </script>';         
+            echo "<span style='color:red'>" . "Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. Ga terug, controleer de gegevens en probeer het opnieuw." . "</span>";       
         } 
         else
         {

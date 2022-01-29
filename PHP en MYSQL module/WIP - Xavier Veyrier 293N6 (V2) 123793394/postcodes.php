@@ -2,7 +2,8 @@
 require_once 'includes/connection.php';
 require_once 'includes/functions.php';
 
-if (isset($_POST['postcode'])) {
+// if (isset($_POST['postcode'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
     $postcode = get_post($conn, "postcode");
     $adres = get_post($conn, "straat");
     $woonplaats = get_post($conn, "woonplaats");

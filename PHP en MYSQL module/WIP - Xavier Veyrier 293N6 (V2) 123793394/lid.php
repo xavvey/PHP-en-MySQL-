@@ -1,229 +1,181 @@
+<?php
+require_once 'includes/connection.php';
+require_once 'includes/functions.php';
+
+if (isset($_POST['update_lid'])) {
+    $lidnummer = get_post($conn, 'lidnummer');
+    $num_telnrs = get_post($conn, 'num-telnrs');
+    $num_emails = get_post($conn, 'num-emails');
+
+    $num_data_affected = 0;
+    foreach ($_POST as $data => $info) {        
+        $info = get_post($conn, $data);
+
+        if ($data == 'naam' || $data == 'voornaam' || $data == 'huisnummer' || $data == 'postcode') {
+            $stmt_data = $conn->prepare("UPDATE leden SET " . $data . "=? WHERE lidnummer=?");
+            $stmt_data->bind_param('si', $info, $lidnummer);
+            $stmt_data->execute();
+
+            $affected_info = $stmt_data->affected_rows;
+            $stmt_data->close();
+        }    
+        $num_data_affected += $affected_info;      
+    }
+    
+    for ($t = 0; $t < $num_telnrs; ++$t) {
+        $telnr_num = $t + 1;
+        $telnr_new = get_post($conn, 'telefoonnummer' . $telnr_num);
+        $telnr_old = get_post($conn, 'oud-telnr' . $telnr_num);
+
+        if ($telnr_new != $telnr_old) {    
+            delete_row($conn, 'telefoonnummers', 'telefoonnummer', $telnr_old);                             
+            $affected_row = insert_row($conn, 'telefoonnummers', $telnr_new, $lidnummer);
+        }
+    }
+    $num_data_affected += $affected_row;
+
+    for ($t = 0; $t < $num_emails; ++$t) {
+        $email_num = $t + 1;
+        $email_new = get_post($conn, 'email' . $email_num);
+        $email_old = get_post($conn, 'oud-email' . $email_num);
+
+        if($email_new != $email_old)
+        {           
+            delete_row($conn, 'emails', 'email', $email_old);       
+            $affected_row = insert_row($conn, 'emails', $email_new, $lidnummer);
+        }
+    }
+    $num_data_affected += $affected_row;
+
+    if ($num_data_affected < 1) {
+        echo "<span style='color:red'>" . "Het lijkt erop dat niets gewijzigd is. Ga terug, controleer de gegevens en of de postcode bestaat. Probeert u het opnieuw" . "</span>";  
+    }
+
+    $conn->close(); 
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
-<title>Update lid</title>
-  <link rel="stylesheet" type="text/css" href="includes/CSS/general_styling.css" /> 
-</head>
+    <title>Update lid</title>
+        <link rel="stylesheet" type="text/css" href="includes/CSS/general_styling.css" /> 
+    </head>
 <body>
-
-<div>
-    <h1>Update lid</h1>
+<?php
+if (getNumDbTables($conn, $database) == 0) {echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; // Bij geen tabellen wordt dit getoond.
+} else { 
+?>
+    <h1>Lid</h1>
     <a href='index.php'>Naar ledenoverzicht</a><br>
     <a href='postcodes.php'>Naar postcode overzicht</a>
-</div>
 
-<?php
-require_once 'includes/connection.php';
-require_once 'includes/helper_functions.php';
-
-ob_start(); // Snap niet precies wat dit doet maar zonder dit dan werkt de delete knop niet -> 'Cannot modify header information' error komt dan tevoorschijn
-//oorzaak error gevonden, maar weet fix niet (ligt aan header() op regels 237 & 248)
-
-if(isset($_GET['lidnummer'])) 
-{ 
-    $lidnummer = $_GET['lidnummer'];
-}
-?>
-<div class="contact-form">     
-    <h3>Voeg contactgegevens toe:</h3>
-    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
-        <label for="telefoonnummer">
-            Telefoonnummer:
-            <input type="text" name="telefoonnummer" maxlength="13" required>
-        </label>
-        <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
-        <button type="submit" name='add_telnr'>Voeg telnr toe</button>
-    </form><br>
-    <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">        
-        <label for="email">
-            Email:
-            <input type="email" name="email" required>
-        </label>
-        <input type='hidden' name='lidnummer' value='<?php echo $lidnummer ?>'>
-        <button type="submit" name='add_email'>Voeg email toe</button>
-    </form><br>
     <?php
-    if(isset($_POST['add_telnr']))
-    {
-        $telnr = get_post($conn, 'telefoonnummer');
-        $lidnummer = get_post($conn, 'lidnummer');
-
-        $num_inserts = insert_row($conn, 'telefoonnummers', $telnr, $lidnummer);
-    
-        if($num_inserts != 1)
-        { 
-            echo "<span style='color:red'>" . "Telefoonnummer niet toegevoegd. Waarschijnlijk bestaat deze al. Ga terug, controleer de lijst en/of probeer het opnieuw." . "</span>";         
-        } 
-        else
-        {
-            header("location: lid.php?lidnummer=$lidnummer");
-        }
-    
-        $stmt_telnr->close();
-        $conn->close();
-    }
-    
-    if(isset($_POST['add_email']))
-    {
-        $email = get_post($conn, 'email');
-        $lidnummer = get_post($conn, 'lidnummer');
-    
-        $num_inserts = insert_row($conn, 'emails', $email, $lidnummer);
-    
-        if($num_inserts != 1)
-        { 
-            echo "<span style='color:red'>" . "Emailadres niet toegevoegd. Waarschijnlijk bestaat deze al. Ga terug, controleer de lijst en/of probeer het opnieuw." . "</span>";         
-        } 
-        else
-        {
-            header("location: lid.php?lidnummer=$lidnummer");
-        }
-    
-        $stmt_email->close();
-        $conn->close();
-    }
+    if (!isset($_GET['lidnummer'])) { 
     ?>
-</div>
+    
+    <h3>Voeg nieuw lid toe:</h3>
 
-<div>
+    <div class="leden-form">     
+        <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
+            <label for="naam">
+                Voornaam:
+                <input type="text" name="voornaam" required>
+            </label>
+            <label for="achternaam">
+                Achternaam:
+                <input type="text" name="achternaam" required>
+            </label>
+            <label for="huisnummer">
+                Huisnummer:
+                <input type="text" name="huisnummer" required>
+            </label>
+            <label for="postcode">
+                Postcode:
+                <select name="postcode" required>
+                    <option disabled selected value>------</option>
+                    <?php     
+                    $postcode_query = "SELECT * FROM postcodes
+                                        ORDER BY postcode"; 
+            
+                    $postcode_result = $conn->query($postcode_query);
+                    if (!$postcode_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+                                                    Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+
+                    $num_postcodes = $postcode_result->num_rows;
+
+                    for ($p = 0; $p < $num_postcodes; ++$p) {
+                        $row = $postcode_result->fetch_array(MYSQLI_ASSOC);
+
+                        $postcode = htmlspecialchars($row['postcode']);
+                        $straat = htmlspecialchars($row['adres']);
+                        $woonplaats = htmlspecialchars($row['woonplaats']);
+
+                        echo "<option value='$postcode'>" . $postcode . " - " . $straat . " - " . $woonplaats . "</option>"; 
+                    } 
+
+                    $postcode_result->close();
+                    ?>
+                </select>
+            </label>
+            <label for="emailadres">
+                E-mailadres(sen):
+                <!-- <input type="text" name="emailadres" placeholder="plaats bij meerdere email adressen deze op een nieuwe regel" multiple> -->
+                <textarea name="emailadres" cols="45" rows="4" placeholder="Scheidt meerdere email adressen met een enter"></textarea>
+            </label>
+            <label for="telnr">
+                Telefoonummer(s):
+                <!-- <input type="text" name="telnr" placeholder="0611457894, +318826549524" multiple> -->
+                <textarea name="telnr" cols="45" rows="4" placeholder="Scheidt meerdere telefoonnummers met een enter"></textarea>
+            </label>
+            <button type="submit" name='add_member'>Voeg lid toe</button>
+        </form><br>
+    </div>
+    <?php
+    } else {
+        $lidnummer = $_GET['lidnummer'];
+    ?>
     <h3>Lid:</h3>
     <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
         <table>
             <tbody>
                 <tr>
-                    <th>#</th>
-                    <th>Info</th>
+                    <th>Lidnummer</th>
+                    <th>Voornaam</th>
+                    <th>Voornaam</th>
+                    <th>Voornaam</th>
                 </tr>
                 <?php 
                 $select_lid_query = "SELECT * FROM leden 
                                         INNER JOIN postcodes ON postcodes.postcode = leden.postcode
-                                        NATURAL JOIN telefoonnummers
                                         WHERE lidnummer='$lidnummer'";
 
                 $select_lid_result = $conn->query($select_lid_query);
-                if(!$select_lid_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
-                                        Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
+                if (!$select_lid_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
+                    Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
 
                 $gegevens_lid = $select_lid_result->fetch_array(MYSQLI_ASSOC);
 
-                foreach($gegevens_lid as $data => $info)
-                {
+                foreach ($gegevens_lid as $data) {
+                var_dump($data);
                     echo '<tr>';
                     echo '<td><b>' . ucfirst(htmlspecialchars($data)) . '</b></td>';
                     echo '<td>' . htmlspecialchars($info) . '</td>';
                     echo '</tr>';
 
-                //     if($data == 'lidnummer' || $data == 'adres' || $data == 'woonplaats')
-                //     {
-                //         echo '<td>' . htmlspecialchars($info) . '</td>';
-                //         echo '<td> ---- </td>';
-                        
-                //     } 
-                //     elseif($data == 'postcode')
-                //     {
-                //         echo '<td><input type="text" pattern="^[1-9][0-9]{3}[\s]?[A-Za-z]{2}" name="' . $data . '" value="' . $info . '" required></td>';
-                //         echo '<td> ---- </td>';
-                //     }
-                //     else
-                //     {
-                //         echo '<td><input type="text" name="' . $data . '" value="' . $info . '" required></td>';
-                //         echo '<td> ---- </td>';
-                //     }            
-                //     echo '<input type="hidden" name="lidnummer" value="' . $gegevens_lid['lidnummer'] . '">'; 
-                //     echo '</tr>';
-                }
-
-                // show_member_contacts('telefoonnummers', $gegevens_lid, $conn, 'telefoonnummer', 'lid_table');
-                // show_member_contacts('emails', $gegevens_lid, $conn, 'email', 'lid_table');
-
+                }            
+                
                 $select_lid_result->close();
-                              
                 ?>
-                <td colspan="2" ><button type="submit" name="update_lid">Save</button></td>          
+                <td colspan="2" style="text-align:center"><button type="submit" name="update_lid">Save</button></td>          
             </tbody>
         </table>
-    </form>
+    </form>    
     <?php
-    if(isset($_POST['update_lid']))
-    {
-        $lidnummer = get_post($conn, 'lidnummer');
-        $num_telnrs = get_post($conn, 'num-telnrs');
-        $num_emails = get_post($conn, 'num-emails');
-    
-        $num_data_affected = 0;
-        foreach($_POST as $data => $info)
-        {        
-            $info = get_post($conn, $data);
-    
-            if($data == 'naam' || $data == 'voornaam' || $data == 'huisnummer' || $data == 'postcode')
-            {
-                $stmt_data = $conn->prepare("UPDATE leden SET " . $data . "=? WHERE lidnummer=?");
-                $stmt_data->bind_param('si', $info, $lidnummer);
-                $stmt_data->execute();
-    
-                $affected_info = $stmt_data->affected_rows;
-                $stmt_data->close();
-            }    
-            $num_data_affected += $affected_info;      
-        }
-        
-        for($t = 0; $t < $num_telnrs; ++$t)
-        {
-            $telnr_num = $t + 1;
-            $telnr_new = get_post($conn, 'telefoonnummer' . $telnr_num);
-            $telnr_old = get_post($conn, 'oud-telnr' . $telnr_num);
-    
-            if($telnr_new != $telnr_old)
-            {    
-                delete_row($conn, 'telefoonnummers', 'telefoonnummer', $telnr_old);                             
-                $affected_row = insert_row($conn, 'telefoonnummers', $telnr_new, $lidnummer);
-            }
-        }
-        $num_data_affected += $affected_row;
-    
-        for($t = 0; $t < $num_emails; ++$t)
-        {
-            $email_num = $t + 1;
-            $email_new = get_post($conn, 'email' . $email_num);
-            $email_old = get_post($conn, 'oud-email' . $email_num);
-    
-            if($email_new != $email_old)
-            {           
-                delete_row($conn, 'emails', 'email', $email_old);       
-                $affected_row = insert_row($conn, 'emails', $email_new, $lidnummer);
-            }
-        }
-        $num_data_affected += $affected_row;
-    
-        if($num_data_affected < 1)
-        {
-            echo "<span style='color:red'>" . "Het lijkt erop dat niets gewijzigd is. Ga terug, controleer de gegevens en of de postcode bestaat. Probeert u het opnieuw" . "</span>";  
-        }
     }
-
-    if(isset($_GET['telefoonnummer']) && isset($_GET['lidnummer']))
-    {   
-        $telefoonnummer = $_GET['telefoonnummer'];
-        $lidnummer = $_GET['lidnummer'];
-
-        delete_row($conn, 'telefoonnummers', 'telefoonnummer', $telefoonnummer);
-
-        header("location: lid.php?lidnummer=$lidnummer"); //geeft header error zonder ob_start()
-    } 
-    elseif(isset($_GET['email']) && isset($_GET['lidnummer']))
-    {
-        $email = $_GET['email'];
-        $lidnummer = $_GET['lidnummer'];
-
-        delete_row($conn, 'emails', 'email', $email);
-
-        header("location: lid.php?lidnummer=$lidnummer"); //geeft header error zonder ob_start()
-    }
-
-    $conn->close(); 
-    ob_end_flush();
     ?>
-</div>
-
+<?php
+} 
+?>
 </body>
 </html>

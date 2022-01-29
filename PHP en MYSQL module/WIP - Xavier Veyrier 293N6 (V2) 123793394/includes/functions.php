@@ -1,6 +1,20 @@
 <?php
 require_once __DIR__ . '../connection.php';
 
+function getNumDbTables($conn, $database) // 3x gebruikt
+{
+    $show_tables_query = "SHOW TABLES FROM $database";
+    $show_tables_result = $conn->query($show_tables_query);
+    $num_tables = $show_tables_result->num_rows;
+
+    return $num_tables;
+}
+
+function get_post($conn, $var)
+{
+    return $conn->real_escape_string($_POST[$var]);
+}
+
 function show_member_contacts($db_table, $init_row, $connection, $db_column, $usage) // 4x gebruikt
 {
     $subquery = "SELECT * FROM $db_table WHERE lidnummer='$init_row[lidnummer]'";
@@ -47,14 +61,14 @@ function show_member_contacts($db_table, $init_row, $connection, $db_column, $us
 
 function insert_contact_details($conn, $input, $db_table) // 2x gebruikt
 {
-    if($input != "")
-    {
+    if ($input != "") {
         $stmt = $conn->prepare('INSERT INTO ' . $db_table . ' VALUES (?, LAST_INSERT_ID())');
 
-        $contacts_arr = explode(",", $input);  
+        $contacts_arr = explode('\r\n', $input); 
+        
+        // $contacts_arr = preg_split('/\r\n|[\r\n]/', $input); 
 
-        foreach($contacts_arr as $contact)
-        {      
+        foreach($contacts_arr as $contact) {      
             $stmt->bind_param('s', $contact,);
             $stmt->execute();
         }
@@ -80,11 +94,6 @@ function delete_row($conn, $db_table, $db_column, $row_reference) // 8x gebruikt
     $stmt_del_row->bind_param('s', $row_reference);
     if(!$stmt_del_row->execute()) die ("<span style='color:red'>" . "Verwijderen van " . $db_column . " mislukt. Probeert u het opnieuw<br>" . "</span>");
     $stmt_del_row->close();
-}
-
-function get_post($conn, $var) //24x gebruikt
-{
-    return $conn->real_escape_string($_POST[$var]);
 }
 
 ?>

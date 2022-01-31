@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         showErrorOrRedirect(
             $stmt, 
             "Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Probeer het opnieuw.",
-            "postcodes"
+            "postcodes",
         );
 
         $stmt->close();
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         showErrorOrRedirect(
             $stmt, 
             "Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. Controleer de gegevens en probeer het opnieuw.",
-            "postcodes"
+            "postcodes",
         );
 
         $stmt->close();
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         showErrorOrRedirect(
             $stmt, 
             "Verwijderen van postcode mislukt. Probeert u het opnieuw",
-            "postcodes"
+            "postcodes",
         );
 
         $stmt->close();
@@ -67,10 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <?php
         if ($_GET['postcode']) {
+            $postcode = $_GET['postcode'];
+
             $stmt = $conn->prepare("SELECT * FROM postcodes WHERE postcode=?");
-            $stmt->bind_param('s', $_GET['postcode']);
+            $stmt->bind_param('s', $postcode);
             $stmt->execute();
-            $result = $stmt->get_result()->fetch_assoc();          
+            $result = $stmt->get_result()->fetch_array(MYSQLI_ASSOC);          
             ?>
             <div class='postcode-form'>
                 <h3>Update postcode</h3>

@@ -48,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->close();
     }
-
 }
 ?>
 
@@ -101,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
                     <label for="postcode">
                         Postcode:
-                        <input type="text" name="postcode" pattern='^[1-9][0-9]{3}?[A-Z]{2}' placeholder="1234AB" required>
+                        <input type="text" name="postcode" pattern='^[1-9][0-9]{3}?[A-Z]{2}' placeholder="1234AB" title="1234AB (Met hoofdletters; zonder spaties" required>
                     </label>
                     <label for="straat">
                         Straat:

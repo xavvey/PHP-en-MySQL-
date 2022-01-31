@@ -11,9 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
         $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
         $stmt->execute();
+        $affected_rows = $stmt->affected_rows;
 
         showErrorOrRedirect(
-            $stmt, 
+            $affected_rows, 
             "Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Probeer het opnieuw.",
             "postcodes",
         );
@@ -25,9 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare('UPDATE postcodes SET adres=?, woonplaats=? WHERE postcode=?');
         $stmt->bind_param('sss', $adres, $woonplaats, $postcode);
         $stmt->execute();
+        $affected_rows = $stmt->affected_rows;
 
         showErrorOrRedirect(
-            $stmt, 
+            $affected_rows, 
             "Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. Controleer de gegevens en probeer het opnieuw.",
             "postcodes",
         );
@@ -39,9 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("DELETE FROM postcodes WHERE postcode=?");
         $stmt->bind_param('s', $postcode);
         $stmt->execute();
+        $affected_rows = $stmt->affected_rows;
 
         showErrorOrRedirect(
-            $stmt, 
+            $affected_rows, 
             "Verwijderen van postcode mislukt. Probeert u het opnieuw",
             "postcodes",
         );
@@ -114,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
                     <button type="submit" name='add_postcode'>Voeg postcode toe</button>
                 </form><br>    
+
                 <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">           
                     <h3>Verwijder postcode</h3>
                     <label for="postcode">

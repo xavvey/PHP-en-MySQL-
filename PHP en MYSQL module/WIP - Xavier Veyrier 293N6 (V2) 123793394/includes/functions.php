@@ -10,13 +10,13 @@ function getNumDbTables($conn, $database)
     return $num_tables;
 }
 
-
 function selectPostcodeOptions($conn) 
 {
     $postcode_query = "SELECT * FROM postcodes
                         ORDER BY postcode"; 
 
     $postcode_result = $conn->query($postcode_query);
+
     if (!$postcode_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
                                     Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
 
@@ -35,33 +35,73 @@ function selectPostcodeOptions($conn)
     $postcode_result->close();
 }
 
-
-function showErrorOrRedirect($stmt, $message, $redirect_page)
-{
-    $page = $redirect_page . ".php";
-
-    if($stmt->affected_rows == 0) {
-        echo "<span style='color:red'>" . $message . "</span>";       
-    } else {
-        header("Location: $page");
-        exit;
-    }
-}
-
-function insertContactDetails($conn, $input, $db_table)
+function insertEmails($conn, $input, $lidnummer=null)
 {
     if ($input == "") {
         return;
     } else {
-        $stmt = $conn->prepare('INSERT INTO ' . $db_table . ' VALUES (?, LAST_INSERT_ID())');
+        if (empty($lidnummer)) {
+            $stmt = $conn->prepare('INSERT INTO emails VALUES (?, LAST_INSER_ID())');
+            $contacts_arr = explode('\r\n', $input);
+            foreach($contacts_arr as $contact) {      
+                $stmt->bind_param('s', $contact);
+                $stmt->execute();
+            }
+            $stmt->close();
+        } else {
+            $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
+            $contacts_arr = explode('\r\n', $input);
+            foreach($contacts_arr as $contact) {      
+                $stmt->bind_param('si', $contact, $lidnummer);
+                $stmt->execute();
+            }
+            $stmt->close();
+        }      
+    }
+}
+
+function insertTelnrs($conn, $input, $lidnummer="LAST_INSERT_ID()")
+{
+    if ($input == "") {
+        return;
+    } else {
+        $stmt = $conn->prepare('INSERT INTO telefoonnummers VALUES (?, ?)');
 
         $contacts_arr = explode('\r\n', $input); // alleen \n werkt niet in textarea input field
 
         foreach($contacts_arr as $contact) {      
-            $stmt->bind_param('s', $contact,);
+            $stmt->bind_param('si', $contact, $lidnummer);
             $stmt->execute();
         }
         $stmt->close();
+    }
+}
+
+function deleteEmails($conn, $lidnummer)
+{
+    $del_email_stmt = $conn->prepare("DELETE FROM emails WHERE lidnummer=?");
+    $del_email_stmt->bind_param('i', $lidnummer);
+    $del_email_stmt->execute();
+    $del_email_stmt->close();
+}
+
+function deleteTelnrs($conn, $lidnummer)
+{
+    $del_tel_stmt = $conn->prepare("DELETE FROM telefoonnummers WHERE lidnummer=?");
+    $del_tel_stmt->bind_param('i', $lidnummer);
+    $del_tel_stmt->execute();
+    $del_tel_stmt->close();
+}
+
+function showErrorOrRedirect($affected_rows, $message, $redirect_page)
+{
+    $page = $redirect_page . ".php";
+
+    if($affected_rows == 0) {
+        echo "<span style='color:red'>" . $message . "</span>";       
+    } else {
+        header("Location: $page");
+        exit;
     }
 }
 

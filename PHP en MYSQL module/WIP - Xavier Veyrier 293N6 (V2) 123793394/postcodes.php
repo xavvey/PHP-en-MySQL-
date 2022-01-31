@@ -2,7 +2,6 @@
 require_once 'includes/connection.php';
 require_once 'includes/functions.php';
 
-// if (isset($_POST['postcode'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
     $postcode = get_post($conn, "postcode");
     $adres = get_post($conn, "straat");
@@ -13,39 +12,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
         $stmt->execute();
 
-        if($stmt->affected_rows != 1) { 
-            echo "<span style='color:red'>" . "Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Probeer het opnieuw." . "</span>";       
-        } else {
-            header("location: postcodes.php");
-        }
+        showErrorOrRedirect(
+            $stmt, 
+            "Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Probeer het opnieuw.",
+            "postcodes"
+        );
 
         $stmt->close();
     }
 
     if (isset($_POST['update_postcode'])) {
-        var_dump($_POST);
-        // $stmt = $conn->prepare('UPDATE postcodes SET adres=?, woonplaats=? WHERE postcode=?');
-        // $stmt->bind_param('sss', $adres, $woonplaats, $postcode);
-        // $stmt->execute();
+        $stmt = $conn->prepare('UPDATE postcodes SET adres=?, woonplaats=? WHERE postcode=?');
+        $stmt->bind_param('sss', $adres, $woonplaats, $postcode);
+        $stmt->execute();
 
-        // if($stmt->affected_rows == 0) {
-        //     echo "<span style='color:red'>" . "Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. Controleer de gegevens en probeer het opnieuw." . "</span>";       
-        // } else {
-        //     header("location: postcodes.php");
-        // }
+        showErrorOrRedirect(
+            $stmt, 
+            "Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. Controleer de gegevens en probeer het opnieuw.",
+            "postcodes"
+        );
 
-        // $stmt->close();
+        $stmt->close();
     }
+
+    if (isset($_POST['delete_postcode'])) {
+        $stmt = $conn->prepare("DELETE FROM postcodes WHERE postcode=?");
+        $stmt->bind_param('s', $postcode);
+        $stmt->execute();
+
+        showErrorOrRedirect(
+            $stmt, 
+            "Verwijderen van postcode mislukt. Probeert u het opnieuw",
+            "postcodes"
+        );
+
+        $stmt->close();
+    }
+
 }
-
-if (isset($_GET['postcode']) && isset($_GET['adres'])) {
-    $postcode = $_GET['postcode'];
-
-    delete_row($conn, 'postcodes', 'postcode', $postcode);
-
-    header("location: postcodes.php");
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -62,79 +66,106 @@ if (isset($_GET['postcode']) && isset($_GET['adres'])) {
         <h1>Postcode overzicht</h1>
         <a href='index.php'>Naar ledenoverzicht</a> 
 
-        <div class='postcode-form'>
-            <h3>Voeg nieuwe postcode toe</h3>
+        <?php
+        if ($_GET['postcode']) {
+            $stmt = $conn->prepare("SELECT * FROM postcodes WHERE postcode=?");
+            $stmt->bind_param('s', $_GET['postcode']);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();          
+            ?>
+            <div class='postcode-form'>
+                <h3>Update postcode</h3>
+                <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
+                    <label for="postcode">
+                        Postcode:
+                        <input type="text" name="postcode" value="<?php echo htmlspecialchars($result["postcode"]); ?>" readonly>
+                    </label>
+                    <label for="straat">
+                        Straat:
+                        <input type="text" name="straat" value="<?php echo htmlspecialchars($result["adres"]); ?>" required>
+                    </label>
+                    <label for="woonplaats">
+                        Woonplaats:
+                        <input type="text" name="woonplaats" value="<?php echo htmlspecialchars($result["woonplaats"]); ?>" required>
+                    </label>
+                    <button type="submit" name='update_postcode'>Update postcode</button>
+                </form>
+                <br>
+                <a href="postcodes.php">Cancel update</a>
+            </div>
+        <?php
+        } else {
+        ?>
+            <div class='postcode-form'>
+                <h3>Voeg nieuwe postcode toe</h3>
+                <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
+                    <label for="postcode">
+                        Postcode:
+                        <input type="text" name="postcode" pattern='^[1-9][0-9]{3}?[A-Z]{2}' placeholder="1234AB" required>
+                    </label>
+                    <label for="straat">
+                        Straat:
+                        <input type="text" name="straat" placeholder = "Kerkstraat" required>
+                    </label>
+                    <label for="woonplaats">
+                        Woonplaats:
+                        <input type="text" name="woonplaats" placeholder = "Alkmaar" required>
+                    </label>
+                    <button type="submit" name='add_postcode'>Voeg postcode toe</button>
+                </form><br>    
+                <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">           
+                    <h3>Verwijder postcode</h3>
+                    <label for="postcode">
+                        Postcode:
+                        <select name="postcode" required>
+                            <option disabled selected value>------</option>
+                            <?php
+                            selectPostcodeOptions($conn);
+                            ?>
+                        </select> 
+                    </label>
+                    <button type='submit' name='delete_postcode'>Verwijder postcode</button>    
+                </form>        
+            </div>
 
-            <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
-                <label for="postcode">
-                    Postcode:
-                    <input type="text" name="postcode" pattern='^[1-9][0-9]{3}?[A-Z]{2}' placeholder="1234AB" required>
-                </label>
-                <label for="straat">
-                    Straat:
-                    <input type="text" name="straat" placeholder = "Kerkstraat" required>
-                </label>
-                <label for="woonplaats">
-                    Woonplaats:
-                    <input type="text" name="woonplaats" placeholder = "Alkmaar" required>
-                </label>
-                <button type="submit" name='add_postcode'>Voeg postcode toe</button>
-            </form><br>
-        </div>
+            <h3>Postcodes:</h3>
+            <?php 
+            $postcodes_query = "SELECT * FROM postcodes
+                                    ORDER BY postcode";
 
-        <h3>Postcodes:</h3>
-        <?php 
-        $postcodes_query = "SELECT * FROM postcodes
-                                ORDER BY postcode";
+            $result = $conn->query($postcodes_query);
+            if(!$result) die ("<span style='color:red'>" . "Kon geen postcodes ophalen van de database. Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw". "</span>");
+            $rows = $result->num_rows;
 
-        $result = $conn->query($postcodes_query);
-        if(!$result) die ("<span style='color:red'>" . "Kon geen postcodes ophalen van de database. Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw". "</span>");
-        $rows = $result->num_rows;
-
-        if ($rows == 0) { echo '<h3>Er staan nog geen postcodes in de database. Voeg eerst een postcode toe.</h3>'; }
-        else {
-            echo '<table>';
-            echo '<tbody>';
-            echo '<tr>';
-            echo '<th>Postcode    </th>';
-            echo '<th>Straat      </th>';
-            echo '<th>Woonplaats  </th>';
-            echo '<th>Update      </th>';
-            echo '<th>Delete      </th>';
-            echo '</tr>';
-
-            for ($j = 0 ; $j < $rows ; ++$j) { 
-                $row = $result->fetch_array(MYSQLI_ASSOC);
-
-                echo '<tr>';
-                if ($row['postcode'] == $_GET['postcode']) {
-                    echo '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
-                    ?>
-                    <td><input type="text" name="postcode" value="<?php echo htmlspecialchars($row["postcode"]) ?>" readonly></td>
-                    <?php
-                    // echo '<td><input type="text" name="postcode" value="' . htmlspecialchars($row["postcode"]) . '" readonly">';
-                    // echo '<td>' . htmlspecialchars($row["postcode"])    . '</td>';
-                    echo '<td><input type="text" name="adres" value="' . htmlspecialchars($row["adres"]) . '" required></td>';
-                    echo '<td><input type="text" name="woonplaats" value="' . htmlspecialchars($row["woonplaats"]) . '" required></td>';
-                    echo '<td><button type="submit" name="update_postcode">Save</button></td>';
-                    echo '<td>----</td>';
-                    echo '<input type="hidden" name="postcode" value="'. $row['postcode'] . '">';
-                    echo '</form>';
-                } else {              
-                    echo '<td>' . htmlspecialchars($row["postcode"])    . '</td>';
-                    echo '<td>' . htmlspecialchars($row["adres"])       . '</td>';
-                    echo '<td>' . htmlspecialchars($row["woonplaats"])  . '</td>';
-                    echo '<td><a href="postcodes.php?postcode=' . $row['postcode'] . '">Update</a></td>';
-                    echo '<td><a href="postcodes.php?postcode=' . $row["postcode"] . '&adres=' . $row["adres"] . '">Delete</a></td>';              
-                }
-                echo '</tr>';
+            if ($rows == 0) { echo '<h3>Er staan nog geen postcodes in de database. Voeg eerst een postcode toe.</h3>'; }
+            else {
+                ?>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>Postcode    </th>
+                            <th>Straat      </th>
+                            <th>Woonplaats  </th>
+                            <th>Update      </th>
+                        </tr>
+                        <?php
+                        for ($j = 0 ; $j < $rows ; ++$j) { 
+                            $row = $result->fetch_array(MYSQLI_ASSOC);
+                        ?>           
+                            <tr>
+                                <td><?php echo htmlspecialchars($row["postcode"]) ?></td>
+                                <td><?php echo htmlspecialchars($row["adres"]) ?></td>
+                                <td><?php echo htmlspecialchars($row["woonplaats"]) ?></td>
+                                <td><a href="postcodes.php?postcode=<?php echo $row['postcode']; ?>">Update</a></td>
+                            </tr>
+                        <?php                      
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            <?php
             }
-            echo '</tbody>';
-            echo '</table>';
         }
-
-        $result->close();
-        $conn->close();
     } 
     ?>
 </body>

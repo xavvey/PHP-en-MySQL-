@@ -35,47 +35,39 @@ function selectPostcodeOptions($conn)
     $postcode_result->close();
 }
 
-function insertEmails($conn, $input, $lidnummer=null)
+function insertEmails($conn, $input, $lidnummer)
 {
-    $stmt = null;
+    if ($input == "") { return; }   
 
-    if ($input == "") {
-        return;
-    } else {
-        if (empty($lidnummer)) {
-            $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
-            $lidnummer = $conn->insert_id;      
-        } else {
-            $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
-        }    
-
-        $contacts_arr = explode('\r\n', $input);
-        foreach($contacts_arr as $contact) {  
-            if ($contact == "") { 
-                continue;   
-            }
-            $stmt->bind_param('si', $contact, $lidnummer);
-            $stmt->execute();
+    $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
+    $contacts_arr = explode('\r\n', $input);
+    
+    foreach($contacts_arr as $contact) {  
+        if ($contact == "") { 
+            continue;   
         }
-        $stmt->close();  
+        $stmt->bind_param('si', $contact, $lidnummer);
+        $stmt->execute();
     }
+    $stmt->close();  
 }
 
-function insertTelnrs($conn, $input, $lidnummer="LAST_INSERT_ID()")
+function insertTelnrs($conn, $input, $lidnummer)
 {
-    if ($input == "") {
-        return;
-    } else {
-        $stmt = $conn->prepare('INSERT INTO telefoonnummers VALUES (?, ?)');
+    if ($input == "") { return; }   
 
-        $contacts_arr = explode('\r\n', $input); // alleen \n werkt niet in textarea input field
-
-        foreach($contacts_arr as $contact) {      
-            $stmt->bind_param('si', $contact, $lidnummer);
-            $stmt->execute();
-        }
-        $stmt->close();
+    $stmt = $conn->prepare('INSERT INTO telefoonnummers VALUES (?, ?)');
+    $contacts_arr = explode('\r\n', $input); 
+    
+    foreach($contacts_arr as $contact) {
+        if ($contact == "") {
+            continue;
+        }    
+        $stmt->bind_param('si', $contact, $lidnummer);
+        $stmt->execute();;
     }
+
+    $stmt->close();
 }
 
 function deleteEmails($conn, $lidnummer)
@@ -98,7 +90,7 @@ function showErrorOrRedirect($affected_rows, $message, $redirect_page)
 {
     $page = $redirect_page . ".php";
 
-    if($affected_rows == 0) {
+    if($affected_rows <= 0) { // niet $affected_rows == 0 -> bij bestaande postcode $stmt->affected_rows = -1 
         echo "<span style='color:red'>" . $message . "</span>";       
     } else {
         header("Location: $page");
@@ -110,79 +102,4 @@ function get_post($conn, $var)
 {
     return $conn->real_escape_string($_POST[$var]);
 }
-
-// function queryMemberContacts($conn, $init_row, $db_table)
-// {
-//     $subquery = "SELECT * FROM $db_table WHERE lidnummer='$init_row[lidnummer]'";
-//     $subresult = $conn->query($subquery);
-//     if(!$subresult) die ("<span style='color:red'>" . "Er ging iets mis met het ophalen van de contactgegevens. Probeert u het nog een keer." . "</span>");
-    
-//     return $subresult;
-// }
-
-// function show_member_contacts($db_table, $init_row, $connection, $db_column, $usage) // 4x gebruikt
-// {
-//     $subquery = "SELECT * FROM $db_table WHERE lidnummer='$init_row[lidnummer]'";
-//     $subresult = $connection->query($subquery);
-//     if(!$subresult) die ("<span style='color:red'>" . "Er ging iets mis met het ophalen van de contactgegevens. Probeert u het nog een keer." . "</span>");
-
-//     $subrows = $subresult->num_rows;
-
-//     $num = 1;
-//     for($c = 0; $c < $subrows; ++$c)
-//     {
-//         $subrow = $subresult->fetch_array(MYSQLI_ASSOC);
-
-//         if($usage == 'leden_table')
-//         {            
-//             echo htmlspecialchars($subrow[$db_column]) . "<br>";
-//         }
-//         elseif($usage == 'lid_table')
-//         {   
-//             echo '<tr>';    
-//             if($db_table == 'telefoonnummers')
-//             { 
-//                 echo '<td><b> Telefoonnummer' . " ". $num  . '</b></td>';
-//                 echo '<input type="hidden" name="num-telnrs" value="' . $num . '">';  
-//                 echo '<td><input type="text" name="telefoonnummer' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" maxlength="13" required></td>';
-//                 echo '<input type="hidden" name="oud-telnr' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '">'; 
-//                 echo '<td><a href="lid.php?telefoonnummer=' . rawurlencode($subrow["telefoonnummer"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>';                
-//             }
-//             elseif($db_table == 'emails') 
-//             { 
-//                 echo '<td><b> Email' . " ". $num  . '</td></b>';
-//                 echo '<input type="hidden" name="num-emails" value="' . $num . '">';  
-//                 echo '<td><input type="email" name="email' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '" required></td>';
-//                 echo '<input type="hidden" name="oud-email' . $num . '" value="' . htmlspecialchars($subrow[$db_column]) . '">'; 
-//                 echo '<td><a href="lid.php?email=' . rawurlencode($subrow["email"]) . '&lidnummer=' . $init_row["lidnummer"] . '">Delete</a></td>'; 
-//             }
-//             echo '</tr>';
-//         }
-//         $num += 1;
-//     } 
-
-//     $subresult->close();
-// }
-
-
-function insert_row($conn, $db_table, $new_data, $lidnummer) // 4x gebruikt
-{
-    $stmt_ins_row = $conn->prepare("INSERT INTO $db_table VALUES(?,?)");
-    $stmt_ins_row->bind_param('si', $new_data, $lidnummer);
-    $stmt_ins_row->execute();
-
-    $affected_row = $stmt_ins_row->affected_rows;
-    $stmt_ins_row->close;
-
-    return $affected_row;
-}
-
-// function delete_row($conn, $db_table, $db_column, $row_reference) // 8x gebruikt
-// {
-//     $stmt_del_row = $conn->prepare("DELETE FROM $db_table WHERE $db_column=?");
-//     $stmt_del_row->bind_param('s', $row_reference);
-//     if(!$stmt_del_row->execute()) die ("<span style='color:red'>" . "Verwijderen van " . $db_column . " mislukt. Probeert u het opnieuw<br>" . "</span>");
-//     $stmt_del_row->close();
-// }
-
 ?>

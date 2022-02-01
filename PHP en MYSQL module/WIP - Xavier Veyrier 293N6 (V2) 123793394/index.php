@@ -14,18 +14,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST["add_member"])) {   
         $stmt_lid = $conn->prepare("INSERT INTO leden (naam, voornaam, huisnummer, postcode) VALUES(?, ?, ?, ?)");
         $stmt_lid->bind_param('ssss', $achternaam, $voornaam, $huisnummer, $postcode);
-        $stmt_lid->execute();  
+        $stmt_lid->execute();
+        $stmt_lid->close();
+        
+        $lidnummer = $conn->insert_id;
 
-        insertEmails($conn, $emails);
-        insertTelnrs($conn, $telnrs);
+        insertEmails($conn, $emails, $lidnummer);
+
+        insertTelnrs($conn, $telnrs, $lidnummer);
 
         showErrorOrRedirect(
             $stmt_lid,
-            "Toevoegen van lid mislukt. Controleer de gegevens en probeert u het opnieuw",
+            "Toevoegen van lid mislukt. Controleer de gegevens en/of probeert u het opnieuw",
             "index",
         );
-
-        $stmt_lid->close(); 
     }
 
     if (isset($_POST["delete_member"])) {   
@@ -45,18 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $del_member_stmt->close();
     }
     
-    if (isset($_POST['update_member'])) {
+    if (isset($_POST['update_member'])) {    
         $stmt = $conn->prepare("UPDATE leden SET naam=?, voornaam=?, huisnummer=?, postcode=? WHERE lidnummer=?");
         $stmt->bind_param('ssssi', $achternaam, $voornaam, $huisnummer, $postcode, $lidnummer);
         $stmt->execute();
+        $affected += $stmt->affected_rows;
         
         deleteEmails($conn, $lidnummer);
         deleteTelnrs($conn, $lidnummer);
 
         insertEmails($conn, $emails, $lidnummer);
         insertTelnrs($conn, $telnrs, $lidnummer);
-        
-        // header("Location: index.php");
+
+        header("Location: index.php");
 
         $stmt->close();
     }
@@ -204,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <textarea name="telnr" cols="45" rows="4" placeholder="Scheidt meerdere telefoonnummers met een enter"></textarea>
                     </label>
                     <button type="submit" name='add_member'>Voeg lid toe</button>
-                </form><br>
+                </form>
 
                 <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
                     <h3>Verwijder lid:</h3>

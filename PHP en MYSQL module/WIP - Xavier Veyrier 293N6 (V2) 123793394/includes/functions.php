@@ -37,26 +37,27 @@ function selectPostcodeOptions($conn)
 
 function insertEmails($conn, $input, $lidnummer=null)
 {
+    $stmt = null;
+
     if ($input == "") {
         return;
     } else {
         if (empty($lidnummer)) {
-            $stmt = $conn->prepare('INSERT INTO emails VALUES (?, LAST_INSER_ID())');
-            $contacts_arr = explode('\r\n', $input);
-            foreach($contacts_arr as $contact) {      
-                $stmt->bind_param('s', $contact);
-                $stmt->execute();
-            }
-            $stmt->close();
+            $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
+            $lidnummer = $conn->insert_id;      
         } else {
             $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
-            $contacts_arr = explode('\r\n', $input);
-            foreach($contacts_arr as $contact) {      
-                $stmt->bind_param('si', $contact, $lidnummer);
-                $stmt->execute();
+        }    
+
+        $contacts_arr = explode('\r\n', $input);
+        foreach($contacts_arr as $contact) {  
+            if ($contact == "") { 
+                continue;   
             }
-            $stmt->close();
-        }      
+            $stmt->bind_param('si', $contact, $lidnummer);
+            $stmt->execute();
+        }
+        $stmt->close();  
     }
 }
 

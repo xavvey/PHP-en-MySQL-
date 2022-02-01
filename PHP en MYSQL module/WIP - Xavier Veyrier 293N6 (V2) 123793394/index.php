@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         insertEmails($conn, $emails, $lidnummer);
         insertTelnrs($conn, $telnrs, $lidnummer);
         
-        header("Location: index.php");
+        // header("Location: index.php");
 
         $stmt->close();
     }

@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
                     <label for="postcode">
                         Postcode:
-                        <input type="text" name="postcode" value="<?php echo htmlspecialchars($result["postcode"]); ?>" readonly>
+                        <input type="text" name="postcode" value="<?php echo htmlspecialchars($result["postcode"]); ?>">
                     </label>
                     <label for="straat">
                         Straat:
@@ -152,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <th>Straat      </th>
                             <th>Woonplaats  </th>
                             <th>Update      </th>
+                            <th>Delete      </th>
                         </tr>
                         <?php
                         for ($j = 0 ; $j < $rows ; ++$j) { 
@@ -162,6 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <td><?php echo htmlspecialchars($row["adres"]) ?></td>
                                 <td><?php echo htmlspecialchars($row["woonplaats"]) ?></td>
                                 <td><a href="postcodes.php?postcode=<?php echo $row['postcode']; ?>">Update</a></td>
+                                <td><a href="postcodes.php?postcode=<?php echo $row['postcode']; ?>">Delete</a></td>
                             </tr>
                         <?php                      
                         }

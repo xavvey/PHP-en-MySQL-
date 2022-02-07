@@ -38,36 +38,39 @@ function selectPostcodeOptions($conn)
 function insertEmails($conn, $input, $lidnummer)
 {
     if ($input == "") { return; }   
-
-    $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
-    $contacts_arr = explode('\r\n', $input);
-    
-    foreach($contacts_arr as $contact) {  
-        if ($contact == "") { 
-            continue;   
+    else {
+        $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
+        $contacts_arr = explode('\r\n', $input);
+        
+        foreach($contacts_arr as $contact) {  
+            if ($contact == "") { 
+                continue;   
+            } else {
+                $stmt->bind_param('si', $contact, $lidnummer);
+                $stmt->execute();
+            }
         }
-        $stmt->bind_param('si', $contact, $lidnummer);
-        $stmt->execute();
+        $stmt->close();  
     }
-    $stmt->close();  
 }
 
 function insertTelnrs($conn, $input, $lidnummer)
 {
     if ($input == "") { return; }   
-
-    $stmt = $conn->prepare('INSERT INTO telefoonnummers VALUES (?, ?)');
-    $contacts_arr = explode('\r\n', $input); 
-    
-    foreach($contacts_arr as $contact) {
-        if ($contact == "") {
-            continue;
-        }    
-        $stmt->bind_param('si', $contact, $lidnummer);
-        $stmt->execute();;
-    }
-
-    $stmt->close();
+    else {
+        $stmt = $conn->prepare('INSERT INTO telefoonnummers VALUES (?, ?)');
+        $contacts_arr = explode('\r\n', $input); 
+   
+        foreach($contacts_arr as $contact) {
+            if ($contact == "") {
+                continue;
+            } else {
+                $stmt->bind_param('si', $contact, $lidnummer);
+                $stmt->execute();
+            }
+        }   
+        $stmt->close();
+    }   
 }
 
 function deleteEmails($conn, $lidnummer)

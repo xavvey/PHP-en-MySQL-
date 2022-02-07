@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $postcode = get_post($conn, 'postcode');
     $telnrs = get_post($conn, 'telnr');
     $emails = get_post($conn, 'emailadres');
-    
+  
     if (isset($_POST["add_member"])) {   
         $stmt_lid = $conn->prepare("INSERT INTO leden (naam, voornaam, huisnummer, postcode) VALUES(?, ?, ?, ?)");
         $stmt_lid->bind_param('ssss', $achternaam, $voornaam, $huisnummer, $postcode);
@@ -47,11 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $del_member_stmt->close();
     }
     
-    if (isset($_POST['update_member'])) {    
+    if (isset($_POST['update_member'])) {   
         $stmt = $conn->prepare("UPDATE leden SET naam=?, voornaam=?, huisnummer=?, postcode=? WHERE lidnummer=?");
         $stmt->bind_param('ssssi', $achternaam, $voornaam, $huisnummer, $postcode, $lidnummer);
         $stmt->execute();
-        $affected += $stmt->affected_rows;
+        $stmt->close();
         
         deleteEmails($conn, $lidnummer);
         deleteTelnrs($conn, $lidnummer);
@@ -79,19 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($_GET['lidnummer']) {
             $lidnummer = $_GET['lidnummer'];
 
-            $stmt = $conn->prepare("SELECT * FROM leden WHERE lidnummer=?");
+            $stmt = $conn->prepare("SELECT * FROM leden NATURAL JOIN postcodes WHERE lidnummer=?");
             $stmt->bind_param('i', $lidnummer);
             $stmt->execute();
             $result = $stmt->get_result()->fetch_array(MYSQLI_ASSOC);
             $stmt->close();
-
-            $postcode = htmlspecialchars($result['postcode']);
-
-            $stmt_postcode = $conn->prepare("SELECT * FROM postcodes WHERE postcode=?");
-            $stmt_postcode->bind_param('s', $postcode);
-            $stmt_postcode->execute();
-            $postcode_result = $stmt_postcode->get_result()->fetch_array(MYSQLI_ASSOC);
-            $stmt_postcode->close();
 
             $stmt_email = $conn->prepare("SELECT * FROM emails WHERE lidnummer=?");
             $stmt_email->bind_param('i', $lidnummer);
@@ -130,8 +122,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="postcode">
                         Postcode:
                         <select name="postcode" required>
-                            <option selected disabled value="<?php echo $postcode_result['postcode'] ?>">
-                                <?php echo $postcode_result['postcode']; ?> - <?php echo $postcode_result['adres']; ?> - <?php echo $postcode_result['woonplaats']; ?>
+                            <option selected value="<?php echo $result['postcode']; ?>">
+                                <?php echo $result['postcode']; ?> - <?php echo $result['adres']; ?> - <?php echo $result['woonplaats']; ?>
                             </option>
                             <?php     
                             selectPostcodeOptions($conn);
@@ -261,6 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <th>E-mailadres(sen)</th>
                                 <th>Telefoonnummer(s)</th>
                                 <th>Update</th>
+                                <th>Delete</th>
                             </tr>
                         <?php
                         }
@@ -300,6 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     ?>
                                 </td>
                                 <td><a href="index.php?lidnummer=<?php echo $row["lidnummer"] ?>">Update lid</a></td>
+                                <td><a href="index.php?lidnummer=<?php echo $row["lidnummer"] ?>">Delete lid</a></td>
                             </tr>
                         <?php
                         }

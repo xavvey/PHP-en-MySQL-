@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href='index.php'>Naar ledenoverzicht</a> 
 
         <?php
-        if ($_GET['postcode']) {
+        if (isset($_GET['postcode'])) {
             $postcode = $_GET['postcode'];
 
             $stmt = $conn->prepare("SELECT * FROM postcodes WHERE postcode=?");

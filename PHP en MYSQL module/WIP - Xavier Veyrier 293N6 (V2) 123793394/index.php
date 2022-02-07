@@ -74,9 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </head>
 <body>
     <?php
-    if (getNumDbTables($conn, $database) == 0) {echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; } // Bij geen tabellen wordt dit getoond.
-    else {
-        if ($_GET['lidnummer']) {
+    if (getNumDbTables($conn, $database) == 0) {
+        echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>";
+        exit;
+    } 
+    // else {
+        if (isset($_GET['lidnummer'])) {
             $lidnummer = $_GET['lidnummer'];
 
             $stmt = $conn->prepare("SELECT * FROM leden NATURAL JOIN postcodes WHERE lidnummer=?");
@@ -303,7 +306,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php
         } 
-    } 
+    // } 
     ?>
 </body>
 </html>

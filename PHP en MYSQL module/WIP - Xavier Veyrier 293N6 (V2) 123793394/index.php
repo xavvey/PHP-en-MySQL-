@@ -96,6 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         </div>
     <?php } ?>
     <?php
+        // DELETE
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        // DELETE
+
         if (getNumDbTables($conn, $database) < 1) { // kleiner dan 1 want als 1 ander tabel bestaat dan wordt deze ook getoond
             echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>";
             exit;

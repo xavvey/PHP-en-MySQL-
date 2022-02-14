@@ -2,54 +2,64 @@
 require_once 'includes/connection.php';
 require_once 'includes/functions.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    unset($_SESSION["message"]);
+
     $postcode = get_post($conn, "postcode");
     $adres = get_post($conn, "straat");
     $woonplaats = get_post($conn, "woonplaats");
+    $old_postcode = get_post($conn, "old_postcode");
 
     if (isset($_POST["add_postcode"])) {
-        $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
-        $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
-        $stmt->execute();
-        $affected_rows = $stmt->affected_rows;
-
-        showErrorOrRedirect(
-            $affected_rows, 
-            "Postcode niet toegevoegd. Waarschijnlijk bestaat deze al. Probeer het opnieuw.",
-            "postcodes",
-        );
-
-        $stmt->close();
+        insertPostcode($conn, $postcode, $adres, $woonplaats);
     }
 
-    if (isset($_POST['update_postcode'])) {
-        $stmt = $conn->prepare('UPDATE postcodes SET adres=?, woonplaats=? WHERE postcode=?');
-        $stmt->bind_param('sss', $adres, $woonplaats, $postcode);
-        $stmt->execute();
-        $affected_rows = $stmt->affected_rows;
+    if (isset($_POST["update_postcode"])) {  
+        if($old_postcode == $postcode) {
+            $_SESSION["message"] = "Postcode niet aangepast. Het lijkt erop dat de nieuwe postcode gelijk is aan de oude. Controleer de gegevens en/of probeer het opnieuw";
+            header("Location: postcodes.php");
+        } elseif (deletePostcode($conn, $old_postcode) < 1) {
+            $_SESSION["message"] = "Postcode niet aangepast. Wellicht is deze in gebruik. Controlleer de gegevens en/of probeert u het opnieuw.";
+        } else {
+            insertPostcode($conn, $postcode, $adres, $woonplaats);
+        }
 
-        showErrorOrRedirect(
-            $affected_rows, 
-            "Postcode niet aangepast. Het lijkt erop dat niets gewijzigd is. Controleer de gegevens en probeer het opnieuw.",
-            "postcodes",
-        );
-
-        $stmt->close();
+        header("Location: postcodes.php");             
     }
+}
 
-    if (isset($_POST['delete_postcode'])) {
-        $stmt = $conn->prepare("DELETE FROM postcodes WHERE postcode=?");
-        $stmt->bind_param('s', $postcode);
-        $stmt->execute();
-        $affected_rows = $stmt->affected_rows;
+$postcode = "";
+$adres = "";
+$woonplaats = "";
+$form_title = "Voeg postcode toe";
+$form_action = "add_postcode";
 
-        showErrorOrRedirect(
-            $affected_rows, 
-            "Verwijderen van postcode mislukt. Probeert u het opnieuw",
-            "postcodes",
-        );
+if ($_SERVER['REQUEST_METHOD'] === 'GET') { 
 
-        $stmt->close();
+    if (isset($_GET["action"])) { 
+        unset($_SESSION["message"]);
+        $postcode = $_GET['postcode'];
+
+        if ($_GET["action"] == 'delete_postcode') {
+            deletePostcode($conn, $postcode);
+            header("Location: postcodes.php");
+        }
+
+        if ($_GET["action"] == "update_postcode") {
+            $form_title = "Update postcode";
+            $form_action = "update_postcode";
+            
+            $stmt = $conn->prepare("SELECT * FROM postcodes WHERE postcode=?");
+            $stmt->bind_param('s', $postcode);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_array(MYSQLI_ASSOC);
+       
+            $postcode = htmlspecialchars($result['postcode']);
+            $adres = htmlspecialchars($result['adres']);
+            $woonplaats = htmlspecialchars($result['woonplaats']);
+        }
     }
 }
 ?>
@@ -62,77 +72,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </head>
 <body>
     <?php
-    if (getNumDbTables($conn, $database) == 0) {echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; // Bij geen tabellen wordt dit getoond.
+    if (getNumDbTables($conn, $database) < 1) { // kleiner dan 1 want als 1 ander tabel bestaat dan wordt deze ook getoond
+        echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; // Bij geen tabellen wordt dit getoond.
+        exit;
     } else { 
+        if(!empty($_SESSION['message'])) {
+            $message = $_SESSION['message'];
+            echo "<span style='color:red'>" . $message . "</span>";
+        }
         ?>
         <h1>Postcode overzicht</h1>
         <a href='index.php'>Naar ledenoverzicht</a> 
 
+        <div class='postcode-form'>
+            <h3><?php echo $form_title ?></h3>
+            <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
+                <label for="postcode">
+                    Postcode:
+                    <input type="text" name="postcode" title="1234GE" pattern='^[1-9][0-9]{3}?[A-Z]{2}' value="<?php echo $postcode; ?>" required>
+                    <input type="hidden" name="old_postcode" value="<?php echo $postcode; ?>"> <!-- hidden oude postcode voor update -->
+                </label>
+                <label for="straat">
+                    Straat:
+                    <input type="text" name="straat" value="<?php echo $adres; ?>" required>
+                </label>
+                <label for="woonplaats">
+                    Woonplaats:
+                    <input type="text" name="woonplaats" value="<?php echo $woonplaats; ?>" required>
+                </label>
+                <button type="submit" name='<?php echo $form_action; ?>'>Opslaan</button>
+            </form>
+        </div>
         <?php
-        if (isset($_GET['postcode'])) {
-            $postcode = $_GET['postcode'];
-
-            $stmt = $conn->prepare("SELECT * FROM postcodes WHERE postcode=?");
-            $stmt->bind_param('s', $postcode);
-            $stmt->execute();
-            $result = $stmt->get_result()->fetch_array(MYSQLI_ASSOC);          
-            ?>
-            <div class='postcode-form'>
-                <h3>Update postcode</h3>
-                <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
-                    <label for="postcode">
-                        Postcode:
-                        <input type="text" name="postcode" value="<?php echo htmlspecialchars($result["postcode"]); ?>">
-                    </label>
-                    <label for="straat">
-                        Straat:
-                        <input type="text" name="straat" value="<?php echo htmlspecialchars($result["adres"]); ?>" required>
-                    </label>
-                    <label for="woonplaats">
-                        Woonplaats:
-                        <input type="text" name="woonplaats" value="<?php echo htmlspecialchars($result["woonplaats"]); ?>" required>
-                    </label>
-                    <button type="submit" name='update_postcode'>Update postcode</button>
-                </form>
-                <br>
-                <a href="postcodes.php">Cancel update</a>
-            </div>
-        <?php
-        } else {
+        if (
+            (isset($_GET["action"]) 
+            && $_GET["action"] == "update_postcode")
+        ) {  
         ?>
-            <div class='postcode-form'>
-                <h3>Voeg nieuwe postcode toe</h3>
-                <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
-                    <label for="postcode">
-                        Postcode:
-                        <input type="text" name="postcode" pattern='^[1-9][0-9]{3}?[A-Z]{2}' placeholder="1234AB" title="1234AB (Met hoofdletters; zonder spaties" required>
-                    </label>
-                    <label for="straat">
-                        Straat:
-                        <input type="text" name="straat" placeholder = "Kerkstraat" required>
-                    </label>
-                    <label for="woonplaats">
-                        Woonplaats:
-                        <input type="text" name="woonplaats" placeholder = "Alkmaar" required>
-                    </label>
-                    <button type="submit" name='add_postcode'>Voeg postcode toe</button>
-                </form><br>    
+        <br>
+        <a href="postcodes.php">Cancel update</a>
+        <?php
+        }
 
-                <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">           
-                    <h3>Verwijder postcode</h3>
-                    <label for="postcode">
-                        Postcode:
-                        <select name="postcode" required>
-                            <option disabled selected value>------</option>
-                            <?php
-                            selectPostcodeOptions($conn);
-                            ?>
-                        </select> 
-                    </label>
-                    <button type='submit' name='delete_postcode'>Verwijder postcode</button>    
-                </form>        
-            </div>
-
+        if (
+            !(isset($_GET["action"]) 
+            && $_GET["action"] == "update_postcode")
+        ) {    
+            ?>
             <h3>Postcodes:</h3>
             <?php 
             $postcodes_query = "SELECT * FROM postcodes
@@ -162,8 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <td><?php echo htmlspecialchars($row["postcode"]) ?></td>
                                 <td><?php echo htmlspecialchars($row["adres"]) ?></td>
                                 <td><?php echo htmlspecialchars($row["woonplaats"]) ?></td>
-                                <td><a href="postcodes.php?postcode=<?php echo $row['postcode']; ?>">Update</a></td>
-                                <td><a href="postcodes.php?postcode=<?php echo $row['postcode']; ?>">Delete</a></td>
+                                <td><a href="postcodes.php?action=update_postcode&postcode=<?php echo $row['postcode']; ?>">Update</a></td>
+                                <td><a href="postcodes.php?action=delete_postcode&postcode=<?php echo $row['postcode']; ?>">Delete</a></td>
                             </tr>
                         <?php                      
                         }

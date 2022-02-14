@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '../connection.php';
+require_once __DIR__ . '/connection.php';
 
 function getNumDbTables($conn, $database) 
 {
@@ -37,6 +37,8 @@ function selectPostcodeOptions($conn)
 
 function insertEmails($conn, $input, $lidnummer)
 {
+    $failed_inserts = [];
+
     if ($input == "") { return; }   
     else {
         $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
@@ -47,11 +49,15 @@ function insertEmails($conn, $input, $lidnummer)
                 continue;   
             } else {
                 $stmt->bind_param('si', $contact, $lidnummer);
-                $stmt->execute();
+                if (!$stmt->execute()) {
+                    $failed_inserts[] = $contact;
+                }
             }
         }
         $stmt->close();  
     }
+
+    return $failed_inserts;
 }
 
 function insertTelnrs($conn, $input, $lidnummer)
@@ -73,6 +79,15 @@ function insertTelnrs($conn, $input, $lidnummer)
     }   
 }
 
+function insertPostcode($conn, $postcode, $adres, $woonplaats) {
+    $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
+    $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
+
+    if(!$stmt->execute()) {
+        $_SESSION["message"] = "Postcode niet toegevoegd. Mischien bestaat deze al. Controleert u de gegevens en/of probeert u het opnieuw";
+    }
+}
+
 function deleteEmails($conn, $lidnummer)
 {
     $del_email_stmt = $conn->prepare("DELETE FROM emails WHERE lidnummer=?");
@@ -89,16 +104,15 @@ function deleteTelnrs($conn, $lidnummer)
     $del_tel_stmt->close();
 }
 
-function showErrorOrRedirect($affected_rows, $message, $redirect_page)
-{
-    $page = $redirect_page . ".php";
+function deletePostcode($conn, $postcode) {
+    $stmt = $conn->prepare("DELETE FROM postcodes WHERE postcode=?");
+    $stmt->bind_param('s', $postcode);
+    
+    if(!$stmt->execute()) {
+        $_SESSION['message'] = "Kon postcode niet verwijderen. Waarschijnlijk is deze in gebruik. Controleer of deze in gebruik is en/of probeert u het opnieuw.";
+    } 
 
-    if($affected_rows <= 0) { // niet $affected_rows == 0 -> bij bestaande postcode $stmt->affected_rows = -1 
-        echo "<span style='color:red'>" . $message . "</span>";       
-    } else {
-        header("Location: $page");
-        exit;
-    }
+    return $stmt->affected_rows;
 }
 
 function get_post($conn, $var)

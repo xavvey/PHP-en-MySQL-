@@ -33,11 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $postcode = "";
 $adres = "";
 $woonplaats = "";
+
 $form_title = "Voeg postcode toe";
 $form_action = "add_postcode";
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') { 
-
     if (isset($_GET["action"])) { 
         unset($_SESSION["message"]);
         $postcode = $_GET['postcode'];

@@ -55,14 +55,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$lidnummer = "";
+$voornaam = "";
+$achternaam = "";
+$huisnummer = "";
+$postcode = "";
+$straat = "";
+$woonplaats = "";
+$emails = [];
+$phone_nmbrs = [];
+
+$form_title = "Voeg lid toe";
+$form_action = "add_member";
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET["action"])) {
+        $lidnummer = $_GET['lidnummer'];
 
         if ($_GET['action'] == 'delete_member') {
-
-            $lidnummer = $_GET['lidnummer'];
-
             deleteEmails($conn, $lidnummer);
             deleteTelnrs($conn, $lidnummer);
 
@@ -70,13 +80,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $del_member_stmt->bind_param('i', $lidnummer);
             $del_member_stmt->execute();
 
-            // showErrorOrRedirect(
-            //     $del_member_stmt,
-            //     "Verwijderen van lid mislukt. Probeert u het opnieuw",
-            //     "index",
-            // );
-
             $del_member_stmt->close();
+        }
+
+        if ($_GET["action"] == "update_member") {
+            $form_title = "Update lid";
+            $form_action = "update_member";
+
+            $stmt = $conn->prepare("SELECT * FROM leden NATURAL JOIN postcodes WHERE lidnummer=?");
+            $stmt->bind_param('i', $lidnummer);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_array(MYSQLI_ASSOC);
+            
+            $stmt_email = $conn->prepare("SELECT * FROM emails WHERE lidnummer=?");
+            $stmt_email->bind_param('i', $lidnummer);
+            $stmt_email->execute();
+            $email_result = $stmt_email->get_result();
+            $num_emails = $email_result->num_rows;
+            
+            $stmt_tel = $conn->prepare("SELECT * FROM telefoonnummers WHERE lidnummer=?");
+            $stmt_tel->bind_param('i', $lidnummer);
+            $stmt_tel->execute();
+            $tel_result = $stmt_tel->get_result();
+            $num_tels = $tel_result->num_rows;
+            
+            $voornaam = htmlspecialchars($result['voornaam']);
+            $achternaam = htmlspecialchars($result['naam']);
+            $huisnummer = htmlspecialchars($result['huisnummer']);
+            $postcode = htmlspecialchars($result['postcode']);
+            $straat = htmlspecialchars($result['adres']);
+            $woonplaats = htmlspecialchars($result['woonplaats']);
+
+            for ($i=0; $i < $num_emails; $i++) {
+                $result = $email_result->fetch_assoc();
+                array_push($emails, $result["email"]);
+            }
+
+            for ($i=0; $i < $num_tels; $i++) {
+                $result = $tel_result->fetch_assoc();
+                array_push($phone_nmbrs, $result);
+            }
         }
     }
 }
@@ -94,70 +137,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             <span class="title"><?php echo $notification['title']; ?></span>
             <span class="body"><?php echo $notification['body']; ?></span>
         </div>
-    <?php } ?>
-    <?php
+    <?php 
+    } 
         // DELETE
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         // DELETE
-
+        
         if (getNumDbTables($conn, $database) < 1) { // kleiner dan 1 want als 1 ander tabel bestaat dan wordt deze ook getoond
             echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>";
             exit;
-        }
-
-        if (isset($_GET['lidnummer'])) {
-            $lidnummer = $_GET['lidnummer'];
-
-            $stmt = $conn->prepare("SELECT * FROM leden NATURAL JOIN postcodes WHERE lidnummer=?");
-            $stmt->bind_param('i', $lidnummer);
-            $stmt->execute();
-            $result = $stmt->get_result()->fetch_array(MYSQLI_ASSOC);
-            $stmt->close();
-
-            $stmt_email = $conn->prepare("SELECT * FROM emails WHERE lidnummer=?");
-            $stmt_email->bind_param('i', $lidnummer);
-            $stmt_email->execute();
-            $email_result = $stmt_email->get_result();
-            $num_emails = $email_result->num_rows;
-            $stmt_email->close();
-
-            $stmt_tel = $conn->prepare("SELECT * FROM telefoonnummers WHERE lidnummer=?");
-            $stmt_tel->bind_param('i', $lidnummer);
-            $stmt_tel->execute();
-            $tel_result = $stmt_tel->get_result();
-            $num_tels = $tel_result->num_rows;
-
-            $stmt_tel->close();
-            }
+        } else {
             ?>
+            <h1>Verenigingsoverzicht</h1>
+            <a href='postcodes.php'>Naar postcode overzicht</a>
+
             <div class="leden-form">     
-                <h3>Update lid</h3>
+                <h3><?php echo $form_title ?></h3>
                 <form action="<?php $_SERVER["PHP_SELF"]; ?>" method="POST">
-                    <?php if(isset($lidnummer)) { ?>
+                    <?php if (!empty($lidnummer)) { ?>
                     <label for="lidnummer">
                         Lidnummer:
-                        <input type="text" name="lidnummer" value="<?php echo htmlspecialchars($result['lidnummer']); ?>" readonly>
+                        <input type="text" name="lidnummer" value="<?php echo $lidnummer; ?>" readonly>
                     </label>
                     <?php } ?>
                     <label for="naam">
                         Voornaam:
-                        <input type="text" name="voornaam" value="<?php echo htmlspecialchars($result['voornaam']); ?>" required>
+                        <input type="text" name="voornaam" value="<?php echo $voornaam; ?>" required>
                     </label>
                     <label for="achternaam">
                         Achternaam:
-                        <input type="text" name="achternaam" value="<?php echo htmlspecialchars($result['naam']); ?>" required>
+                        <input type="text" name="achternaam" value="<?php echo $achternaam; ?>" required>
                     </label>
                     <label for="huisnummer">
                         Huisnummer:
-                        <input type="text" name="huisnummer" value="<?php echo htmlspecialchars($result['huisnummer']); ?>" required>
+                        <input type="text" name="huisnummer" value="<?php echo $huisnummer; ?>" required>
                     </label>
                     <label for="postcode">
                         Postcode:
                         <select name="postcode" required>
-                            <option selected value="<?php echo $result['postcode']; ?>">
-                                <?php echo $result['postcode']; ?> - <?php echo $result['adres']; ?> - <?php echo $result['woonplaats']; ?>
+                            <option selected value="<?php echo $postcode; ?>">
+                                <?php echo $postcode; ?> - <?php echo $straat; ?> - <?php echo $woonplaats; ?>
                             </option>
                             <?php     
                             selectPostcodeOptions($conn);
@@ -166,11 +187,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     </label>
                     <label for="emailadres">
                         E-mailadres(sen):
+                        <input type="email" name="emails" value="<?php echo implode(",", $emails); ?>">
                         <textarea name="emailadres" cols="45" rows="4"><?php
-                        for ($i=0; $i < $num_emails; $i++) {
-                            $result = $email_result->fetch_assoc();
-                            echo $result['email'] . "\r\n";
-                        }
+                        // foreach ($emails as $email) {
+                            echo implode(",", $emails);
+                        // }
                         ?></textarea>
                     </label>
                     <label for="telnr">
@@ -182,15 +203,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         }
                         ?></textarea>
                     </label>
-                    <button type="submit" name='update_member'>Update lid</button>
+                    <button type="submit" name='<?php echo $form_action ?>'>Opslaan</button>
                 </form><br>
                 <a href="index.php">Cancel update</a>
             </div>
-    <?php
-        if (!isset($_GET['lidnummer'])) {
-            ?>
-            <h1>Verenigingsoverzicht</h1>
-            <a href='postcodes.php'>Naar postcode overzicht</a>
+            <?php
+            if (!isset($_GET['lidnummer'])) {
+            ?>            
 
             <div>
                 <h3>Leden:</h3>
@@ -260,7 +279,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                     }
                                     ?>
                                 </td>
-                                <td><a href="index.php?lidnummer=<?php echo $row["lidnummer"] ?>">Update lid</a></td>
+                                <td><a href="index.php?action=update_member&lidnummer=<?php echo $row["lidnummer"] ?>">Update lid</a></td>
                                 <td><a href="index.php?action=delete_member&lidnummer=<?php echo $row["lidnummer"] ?>">Delete lid</a></td>
                             </tr>
                         <?php
@@ -270,8 +289,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 </table>
                 </div>
             <?php
+            } 
         } 
-    // } 
-    ?>
+        ?>
 </body>
 </html>

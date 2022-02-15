@@ -4,6 +4,16 @@ require_once 'includes/functions.php';
 
 session_start();
 
+if(!isset($_SESSION["current_page"])) {
+    $_SESSION['current_page'] = basename($_SERVER['PHP_SELF']);
+}
+$_SESSION['previous_page'] = $_SESSION["current_page"];
+$_SESSION["current_page"] = basename($_SERVER['PHP_SELF']);
+
+if ($_SESSION["current_page"] != $_SESSION["previous_page"]) {
+    unset($_SESSION["message"]);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     unset($_SESSION["message"]);
 
@@ -73,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 <body>
     <?php
     if (getNumDbTables($conn, $database) < 1) { // kleiner dan 1 want als 1 ander tabel bestaat dan wordt deze ook getoond
-        echo "<span style='color:red'>" . "Geen tabellen in de database gevonden. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; // Bij geen tabellen wordt dit getoond.
+        echo "<span style='color:red'>" . "Niet alle tabellen bestaan in de database. Voeg deze eerst toe en probeer het opnieuw" . "</span>"; // Bij geen tabellen wordt dit getoond.
         exit;
     } else { 
         if(!empty($_SESSION['message'])) {

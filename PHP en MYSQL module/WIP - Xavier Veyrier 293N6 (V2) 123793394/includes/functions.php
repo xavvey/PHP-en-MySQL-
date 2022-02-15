@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/connection.php';
 
-function getNumDbTables($conn, $database) 
+function getNumDbTables($conn, $database) //2x gebruikt
 {
     $show_tables_query = "SHOW TABLES FROM $database";
     $show_tables_result = $conn->query($show_tables_query);
@@ -10,39 +10,12 @@ function getNumDbTables($conn, $database)
     return $num_tables;
 }
 
-function selectPostcodeOptions($conn) 
+function insertEmails($conn, $input, $lidnummer) // 2x gebruikt
 {
-    $postcode_query = "SELECT * FROM postcodes
-                        ORDER BY postcode"; 
-
-    $postcode_result = $conn->query($postcode_query);
-
-    if (!$postcode_result) die ("<span style='color:red'>" . "Kon geen gegevens van de database ophalen. 
-                                    Klik a.u.b. op het pijltje terug in de browser en probeert u het opnieuw" . "</span>");
-
-    $num_postcodes = $postcode_result->num_rows;
-
-    for ($p = 0; $p < $num_postcodes; ++$p) {
-        $row = $postcode_result->fetch_array(MYSQLI_ASSOC);
-
-        $postcode = htmlspecialchars($row['postcode']);
-        $straat = htmlspecialchars($row['adres']);
-        $woonplaats = htmlspecialchars($row['woonplaats']);
-
-        echo "<option value='$postcode'>" . $postcode . " - " . $straat . " - " . $woonplaats . "</option>"; 
-    } 
-
-    $postcode_result->close();
-}
-
-function insertEmails($conn, $input, $lidnummer)
-{
-    $failed_inserts = [];
-
     if ($input == "") { return; }   
     else {
         $stmt = $conn->prepare('INSERT INTO emails VALUES (?, ?)');
-        $contacts_arr = explode('\r\n', $input);
+        $contacts_arr = explode(',', $input);
         
         foreach($contacts_arr as $contact) {  
             if ($contact == "") { 
@@ -50,36 +23,37 @@ function insertEmails($conn, $input, $lidnummer)
             } else {
                 $stmt->bind_param('si', $contact, $lidnummer);
                 if (!$stmt->execute()) {
-                    $failed_inserts[] = $contact;
+                    $_SESSION["message"] = "Niet alle contactgegevens toegevoegd. Wellicht dat sommige al gebruikt worden of dat u ze dubbel invoert? Controleer de email adressen/telefoonnummers en/of probeert u het nog een keer.";
                 }
             }
         }
         $stmt->close();  
     }
-
-    return $failed_inserts;
 }
 
-function insertTelnrs($conn, $input, $lidnummer)
+function insertTelnrs($conn, $input, $lidnummer) //2x gebruikt
 {
     if ($input == "") { return; }   
     else {
         $stmt = $conn->prepare('INSERT INTO telefoonnummers VALUES (?, ?)');
-        $contacts_arr = explode('\r\n', $input); 
+        $contacts_arr = explode(',', $input); 
    
         foreach($contacts_arr as $contact) {
             if ($contact == "") {
                 continue;
             } else {
                 $stmt->bind_param('si', $contact, $lidnummer);
-                $stmt->execute();
+                if (!$stmt->execute()) {
+                    $_SESSION["message"] = "Niet alle contactgegevens toegevoegd. Wellicht dat sommige al gebruikt worden of dat u ze dubbel invoert? Controleer de email adressen/telefoonnummers en/of probeert u het nog een keer.";
+                }
             }
         }   
         $stmt->close();
     }   
 }
 
-function insertPostcode($conn, $postcode, $adres, $woonplaats) {
+function insertPostcode($conn, $postcode, $adres, $woonplaats) // 2x gebruikt
+{
     $stmt = $conn->prepare('INSERT INTO postcodes VALUES(?, ?, ?)');
     $stmt->bind_param('sss', $postcode, $adres, $woonplaats);
 
@@ -88,7 +62,7 @@ function insertPostcode($conn, $postcode, $adres, $woonplaats) {
     }
 }
 
-function deleteEmails($conn, $lidnummer)
+function deleteEmails($conn, $lidnummer) //2x gebruikt
 {
     $del_email_stmt = $conn->prepare("DELETE FROM emails WHERE lidnummer=?");
     $del_email_stmt->bind_param('i', $lidnummer);
@@ -96,7 +70,7 @@ function deleteEmails($conn, $lidnummer)
     $del_email_stmt->close();
 }
 
-function deleteTelnrs($conn, $lidnummer)
+function deleteTelnrs($conn, $lidnummer) //2x gebruikt
 {
     $del_tel_stmt = $conn->prepare("DELETE FROM telefoonnummers WHERE lidnummer=?");
     $del_tel_stmt->bind_param('i', $lidnummer);
@@ -104,7 +78,8 @@ function deleteTelnrs($conn, $lidnummer)
     $del_tel_stmt->close();
 }
 
-function deletePostcode($conn, $postcode) {
+function deletePostcode($conn, $postcode) //2x gebruikt
+{
     $stmt = $conn->prepare("DELETE FROM postcodes WHERE postcode=?");
     $stmt->bind_param('s', $postcode);
     
@@ -115,7 +90,7 @@ function deletePostcode($conn, $postcode) {
     return $stmt->affected_rows;
 }
 
-function get_post($conn, $var)
+function get_post($conn, $var) //1x gebruikt
 {
     return $conn->real_escape_string($_POST[$var]);
 }

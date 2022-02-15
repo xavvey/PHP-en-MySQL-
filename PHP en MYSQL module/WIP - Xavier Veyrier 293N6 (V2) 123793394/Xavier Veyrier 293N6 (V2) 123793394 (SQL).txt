@@ -45,6 +45,6 @@ INSERT INTO postcodes VALUES ('6542GT', 'Esther de Boer van Rijkpark', 'Heerhugo
 INSERT INTO leden (naam, voornaam, huisnummer, postcode) VALUES ('Kocken', 'Sjoerd', '1-hoog', '6542GT');
 INSERT INTO emails VALUES ('Sjoerd@mail.com', LAST_INSERT_ID());
 INSERT INTO emails VALUES ('Sjoerdprive@mail.com', LAST_INSERT_ID());
-INSERT INTO telefoonnummers VALUES ('+311085467985', LAST_INSERT_ID());
-INSERT INTO telefoonnummers VALUES ('+31645785426', LAST_INSERT_ID());
-INSERT INTO telefoonnummers VALUES ('+317258546546', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('0031108546798', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('0031645785426', LAST_INSERT_ID());
+INSERT INTO telefoonnummers VALUES ('0031725854654', LAST_INSERT_ID());

@@ -90,7 +90,7 @@ function deletePostcode($conn, $postcode) //2x gebruikt
     return $stmt->affected_rows;
 }
 
-function get_post($conn, $var) //1x gebruikt
+function get_post($conn, $var) //11x gebruikt
 {
     return $conn->real_escape_string($_POST[$var]);
 }
